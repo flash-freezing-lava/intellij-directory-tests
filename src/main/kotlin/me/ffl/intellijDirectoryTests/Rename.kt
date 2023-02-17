@@ -1,0 +1,30 @@
+package me.ffl.intellijDirectoryTests
+
+import com.intellij.refactoring.util.CommonRefactoringUtil.RefactoringErrorHintException
+import com.intellij.util.io.exists
+import com.intellij.util.io.readText
+import io.kotest.matchers.shouldBe
+import me.ffl.intellijDirectoryTests.MarkupFile.Companion.findCaret
+import kotlin.io.path.div
+
+val renameExecutor: KotestExecutor = {
+    val beforeFiles = loadBeforeProject()
+    val newName = (testDataPath / "new_name.txt").readText()
+    val errorFile = testDataPath / "should_fail.txt"
+    val caret = beforeFiles.findCaret()
+
+    try {
+        caret.file.renameElementAt(caret.offset, newName)
+        if (errorFile.exists()) {
+            fail("rename did not fail, when it was expected")
+        }
+        checkAfterProject()
+    } catch (e: RefactoringErrorHintException) {
+        if (!errorFile.exists()) {
+            fail("unexpected rename error: ${e.message}")
+        } else {
+            val expected = errorFile.readText()
+            e.message shouldBe expected
+        }
+    }
+}

@@ -1,0 +1,102 @@
+package me.ffl.intellijDirectoryTests
+
+import com.intellij.openapi.application.runWriteAction
+import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.testFramework.VfsTestUtil
+import com.intellij.testFramework.fixtures.CodeInsightTestFixture
+import com.intellij.util.io.exists
+import com.intellij.util.io.isDirectory
+import com.intellij.util.io.isFile
+import com.intellij.util.io.readText
+import io.kotest.assertions.collectOrThrow
+import io.kotest.assertions.errorCollector
+import io.kotest.assertions.failure
+import io.kotest.matchers.ints.shouldBeExactly
+import io.kotest.matchers.shouldBe
+import java.nio.file.Path
+import kotlin.io.path.Path
+import kotlin.io.path.div
+import kotlin.io.path.listDirectoryEntries
+import kotlin.io.path.name
+
+class KotestExecutorContext(
+    val testName: String,
+    val testDataPath: Path,
+    val myFixture: CodeInsightTestFixture,
+    val config: DirectoryTestConfig,
+) {
+    fun loadBeforeProject(): List<MarkupFile> = (testDataPath / "before").loadProject()
+
+    /**
+     * Compare if the resulting code and caret position matches the specified result in the `after` directory.
+     */
+    fun checkAfterProject() {
+        val openFileName = myFixture.file.name
+        val caret = myFixture.caretOffset
+        val afterRootPath = testDataPath / "after"
+        val currentRoot = myFixture.tempDirFixture.getFile(".")!!
+
+        fun checkFile(file: VirtualFile) {
+            val currentFiles = file.children
+            val relPath = Path(currentRoot.path).relativize(Path(file.path))
+            val referencePath = afterRootPath / relPath
+
+            if (file.isDirectory) {
+                if (!referencePath.isDirectory()) {
+                    fail("$relPath was a directory, but should have been a regular file")
+                    return
+                }
+                val referenceFiles = referencePath.listDirectoryEntries()
+                currentFiles.forEach { currentFile ->
+                    checkFile(currentFile)
+                }
+                val missingFiles = referenceFiles.filter { afterFile -> currentFiles.none { it.name == afterFile.name } }
+                if (missingFiles.isNotEmpty()) {
+                    fail("missed files ${missingFiles.map(afterRootPath::relativize)}")
+                }
+            } else {
+                if (!referencePath.exists()) {
+                    fail("$relPath had no corresponding file in after project")
+                } else if (!referencePath.isFile()) {
+                    fail("$relPath was not a file in after project")
+                } else {
+                    myFixture.openFileInEditor(file)
+                    val afterFileMarkup = MarkupFile(myFixture, null, referencePath.readText(), file.name)
+                    try {
+                        myFixture.checkResult(afterFileMarkup.code, false)
+                    } catch (e: Throwable) {
+                        fail("unexpected content in file ${file.name}", e)
+                    }
+                    val requiredCaret = afterFileMarkup.findCaret() ?: return
+                    openFileName shouldBe file.name
+                    requiredCaret shouldBeExactly caret
+                }
+            }
+        }
+
+        checkFile(currentRoot)
+    }
+
+    fun Path.loadProject(): List<MarkupFile> = runWriteAction {
+        val referenceRootPath = this
+        val root = myFixture.tempDirFixture.getFile(".")!!
+
+        fun markupFile(path: Path): List<MarkupFile> {
+            val relPath = referenceRootPath.relativize(path)
+            return if (path.isDirectory()) {
+                // Don't create project dir. It already exists.
+                if (referenceRootPath != path) VfsTestUtil.createDir(root, relPath.toString())
+                path.listDirectoryEntries().flatMap(::markupFile)
+            } else {
+                val file = VfsTestUtil.createFile(root, relPath.toString())
+                listOf(MarkupFile(myFixture, file, path.readText()).apply { assertExactParsingErrors() })
+            }
+        }
+
+        return@runWriteAction markupFile(referenceRootPath)
+    }
+
+    fun fail(message: String, cause: Throwable? = null) {
+        errorCollector.collectOrThrow(failure(message, cause))
+    }
+}
