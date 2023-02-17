@@ -57,8 +57,10 @@ abstract class DirectoryTests(config: DirectoryTestConfig = DirectoryTestConfig.
     }
 
     afterTest {
-        myFixture?.tearDown()
+        val oldFixture = myFixture
+        // first set this to null, to make sure, this is null, even if tearDown fails
         myFixture = null
+        oldFixture?.tearDown()
     }
 
     val testDataDir = config.testDataPath
