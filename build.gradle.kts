@@ -43,8 +43,8 @@ tasks {
 publishing {
     publications {
         create<MavenPublication>("maven") {
-            groupId = "me.ffl"
-            artifactId = "intellijDirectoryTests"
+            groupId = "io.github.flash-freezing-lava"
+            artifactId = "intellij-directory-tests"
             version = "0.1.0"
 
             from(components["java"])

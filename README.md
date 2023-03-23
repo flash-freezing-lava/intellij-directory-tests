@@ -5,7 +5,7 @@
 Add the following to your `build.gradle.kts` and replace dirTestVersion with the current version `TODO add badge` and `org/your/test/packageName` with the path to your top-level package:
 ```kotlin
 dependencies {
-    testImplementation("me.ffl", "intellijDirectoryTests", dirTestVersion)
+    testImplementation("io.github.flash-freezing-lava", "intellij-directory-tests", dirTestVersion)
 }
 
 val unitTestTask = task<Test>("unitTest") {
