@@ -33,3 +33,4 @@ Create the following class in `src/main/test/org/your/packageName`:
 @Suppress("unused")
 class MyPluginTest: DirectoryTests()
 ```
+You can then execute tests by calling `./gradlew dirTest`.
