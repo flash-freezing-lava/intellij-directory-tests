@@ -19,14 +19,14 @@ dependencies {
     testImplementation("io.github.flash-freezing-lava", "intellij-directory-tests", dirTestVersion)
 }
 
-val unitTestTask = task<Test>("unitTest") {
+val unitTestTask = task<Test>("dirTest") {
     isScanForTestClasses = false
-    include("org/your/test/packageName/*Test.class")
+    include("org/your/packageName/*Test.class")
     useJUnitPlatform()
 }
 ```
 
-Create the following class in `src/main/test/org/your/test/packageName`:
+Create the following class in `src/main/test/org/your/packageName`:
 ```kotlin
 // You can change the executor's behavior by passing something other
 // than [DirectoryTestConfig.default] to the [DirectoryTests] constructor.
