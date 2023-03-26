@@ -4,6 +4,7 @@ import com.intellij.codeInsight.TargetElementUtil
 import com.intellij.codeInsight.documentation.DocumentationManager
 import com.intellij.codeInsight.hints.InlayHintsPassFactory
 import com.intellij.codeInsight.intention.IntentionAction
+import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.model.psi.PsiSymbolService
 import com.intellij.openapi.progress.EmptyProgressIndicator
 import com.intellij.openapi.vfs.VfsUtil
@@ -207,6 +208,12 @@ class MarkupFile(
         myFixture.openFileInEditor(vFile)
         myFixture.editor.caretModel.moveToOffset(offset)
         myFixture.launchAction(action)
+    }
+
+    fun executeCompletionAt(offset: Int): Array<out LookupElement>? {
+        myFixture.openFileInEditor(vFile)
+        myFixture.editor.caretModel.moveToOffset(offset)
+        return myFixture.completeBasic()
     }
 
     /**
