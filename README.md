@@ -2,6 +2,17 @@
 
 ## Give me code
 
+For now, you will have to build the plugin locally, because it is not published on any maven repo.
+First initialize the gradle wrapper with `gradle wrapper`.
+Then use `./gradlew publishToLocalMaven` to install intellij-directory-tests.
+Afterwards, add the following lines to your `build.gradle.kts` file:
+```kotlin
+repositories {
+    mavenLocal()
+}
+```
+You can then follow the below instructions.
+
 Add the following to your `build.gradle.kts` and replace dirTestVersion with the current version `TODO add badge` and `org/your/test/packageName` with the path to your top-level package:
 ```kotlin
 dependencies {
