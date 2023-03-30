@@ -4,20 +4,15 @@ import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.testFramework.VfsTestUtil
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
-import com.intellij.util.io.exists
 import com.intellij.util.io.isDirectory
 import com.intellij.util.io.isFile
-import com.intellij.util.io.readText
 import io.kotest.assertions.collectOrThrow
 import io.kotest.assertions.errorCollector
 import io.kotest.assertions.failure
 import io.kotest.matchers.ints.shouldBeExactly
 import io.kotest.matchers.shouldBe
 import java.nio.file.Path
-import kotlin.io.path.Path
-import kotlin.io.path.div
-import kotlin.io.path.listDirectoryEntries
-import kotlin.io.path.name
+import kotlin.io.path.*
 
 class KotestExecutorContext(
     val testName: String,

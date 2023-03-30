@@ -2,8 +2,6 @@ package me.ffl.intellijDirectoryTests
 
 import com.intellij.psi.impl.DebugUtil
 import com.intellij.testFramework.ParsingTestUtil
-import com.intellij.util.io.exists
-import com.intellij.util.io.readText
 import io.kotest.matchers.shouldBe
 import kotlin.io.path.*
 

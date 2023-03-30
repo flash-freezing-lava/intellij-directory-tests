@@ -1,11 +1,11 @@
 package me.ffl.intellijDirectoryTests
 
 import com.intellij.refactoring.util.CommonRefactoringUtil.RefactoringErrorHintException
-import com.intellij.util.io.exists
-import com.intellij.util.io.readText
 import io.kotest.matchers.shouldBe
 import me.ffl.intellijDirectoryTests.MarkupFile.Companion.findCaret
 import kotlin.io.path.div
+import kotlin.io.path.exists
+import kotlin.io.path.readText
 
 val actionExecutor: KotestExecutor = {
     val beforeDir = testDataPath / "before"
