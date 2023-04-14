@@ -1,6 +1,6 @@
 # Directory-based Test Framework for Intellij Plugins
 
-## Setup
+## Code Setup
 
 For now, you will have to build the plugin locally, because it is not published on any maven repo.
 First initialize the gradle wrapper with `gradle wrapper`.
@@ -13,7 +13,9 @@ repositories {
 ```
 You can then follow the below instructions.
 
-Add the following to your `build.gradle.kts` and replace dirTestVersion with the current version `TODO add badge` and `org/your/test/packageName` with the path to your top-level package:
+## Including directory tests in your project
+
+Add the following to your `build.gradle.kts` and replace dirTestVersion with the current version and `org/your/test/packageName` with the path to your package:
 ```kotlin
 dependencies {
     testImplementation("io.github.flash-freezing-lava", "intellij-directory-tests", dirTestVersion)
@@ -35,7 +37,7 @@ class MyPluginTest: DirectoryTests()
 ```
 You can then execute tests by calling `./gradlew dirTest`.
 
-## Tests
+## Creating Test Data
 
 Tests are placed in `src/test/testData` by default.
 For every tests executor (`parser`, `hints`, `resolve`, etc.), you create a subdirectory in `src/test/testData`.
@@ -48,9 +50,9 @@ Often, you have many tests with the same executor and want to group them. For th
 ## Executors
 
 ### Parser
-A parser tests must have a file, that should be parsed.
+A parser test must have a file, that should be parsed.
 This file must have the test name plus an extension as name.
-A file named `${TESTNAME}.txt` must contain the expected psi tree.
+An additional file named `${TESTNAME}.txt` must contain the expected psi tree.
 
 ### Resolve
 A resolve test case must contain a project, where `<caret>` marks the caret position and `<ref>` marks all expected references.
