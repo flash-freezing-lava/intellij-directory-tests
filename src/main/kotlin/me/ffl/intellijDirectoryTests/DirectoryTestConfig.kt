@@ -33,7 +33,7 @@ data class DirectoryTestConfig(
      */
     val softAssertByDefault: Boolean,
 ) {
-    internal val knownIntentionMap = knownIntentions.associateBy { it.javaClass.simpleName }
+    internal val knownIntentionMap = knownIntentions.associateBy { it.javaClass.simpleName.simplifyIntentionName() }
 
     internal fun createContext(
         testName: String,
@@ -68,5 +68,7 @@ data class DirectoryTestConfig(
             null,
             true,
         )
+
+        fun String.simplifyIntentionName() = removeSuffix("Action").removeSuffix("Intention")
     }
 }

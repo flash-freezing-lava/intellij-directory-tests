@@ -2,6 +2,7 @@ package me.ffl.intellijDirectoryTests
 
 import com.intellij.refactoring.util.CommonRefactoringUtil.RefactoringErrorHintException
 import io.kotest.matchers.shouldBe
+import me.ffl.intellijDirectoryTests.DirectoryTestConfig.Companion.simplifyIntentionName
 import me.ffl.intellijDirectoryTests.MarkupFile.Companion.findCaret
 import kotlin.io.path.div
 import kotlin.io.path.exists
@@ -12,7 +13,7 @@ val actionExecutor: KotestExecutor = {
     val beforeFiles = beforeDir.loadProject()
     val errorFile = testDataPath / "should_fail.txt"
     val (caretFile, caretOffset) = beforeFiles.findCaret()
-    val intention = testDataPath.mapNotNull { config.knownIntentionMap[it.toString().removeSuffix("Action").removeSuffix("Intention")] }.lastOrNull().shouldNotBeNull {
+    val intention = testDataPath.mapNotNull { config.knownIntentionMap[it.toString().simplifyIntentionName()] }.lastOrNull().shouldNotBeNull {
         "test data path contains no Intention class name"
     }
     try {
