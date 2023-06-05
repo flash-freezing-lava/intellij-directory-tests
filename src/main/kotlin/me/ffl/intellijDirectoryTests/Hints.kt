@@ -15,8 +15,8 @@ val hintsExecutor: KotestExecutor = {
             hintOrNull shouldBe null
         } else {
             if (hintOrNull == null) {
-                if (caret.name == null) fail("no hint found at nameless caret")
-                else fail("no hint found at caret ${caret.name}")
+                if (caret.name == null) fail("No hint found at nameless caret")
+                else fail("No hint found at caret ${caret.name}")
             } else {
                 hintOrNull.trimEnd() shouldBe expected.trimEnd()
             }

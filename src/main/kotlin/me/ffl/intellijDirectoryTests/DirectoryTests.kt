@@ -65,8 +65,8 @@ abstract class DirectoryTests(config: DirectoryTestConfig = DirectoryTestConfig.
     val onlyPath = testDataDir / "only.txt"
     val only = if (onlyPath.exists()) onlyPath.readText().trim() else null
     if (!only.isNullOrEmpty()) {
-        test("not all tests were run") {
-            throw AssertionError("some tests were disabled by only.txt")
+        test("Not all tests were run") {
+            throw AssertionError("Some tests were disabled by only.txt")
         }
     }
     fun execute(executor: KotestExecutor, context: KotestExecutorContext) {
@@ -83,7 +83,7 @@ abstract class DirectoryTests(config: DirectoryTestConfig = DirectoryTestConfig.
         val executor = config.kotestExecutors[executorName]
         if (executor == null) {
             test(executorName) {
-                throw AssertionError("no executor found for this directory")
+                throw AssertionError("No executor found for this directory")
             }
         } else {
             context(executorName) {

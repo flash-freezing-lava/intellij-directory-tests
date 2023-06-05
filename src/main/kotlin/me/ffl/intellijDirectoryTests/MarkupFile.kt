@@ -30,7 +30,7 @@ class MarkupFile(
     private val points: List<MarkupPoint>
     val code: String
     val vFile: VirtualFile
-        get() = _vFile ?: error("tried to retrieve non-backed virtual file")
+        get() = _vFile ?: error("Tried to retrieve non-backed virtual file")
 
     constructor(
          myFixture: CodeInsightTestFixture,
@@ -102,9 +102,9 @@ class MarkupFile(
     private fun <T : PsiPolyVariantReference> findReferenceAt(clazz: KClass<T>, offset: Int): T {
         myFixture.openFileInEditor(vFile)
         val reference = myFixture.file.findReferenceAt(offset).shouldNotBeNull {
-            "no reference found at offset ${lineCol(offset)}"
+            "No reference found at offset ${lineCol(offset)}"
         }
-        assert(clazz.isInstance(reference)) { "found reference of type ${reference.javaClass} but expected type $clazz" }
+        assert(clazz.isInstance(reference)) { "Found reference of type ${reference.javaClass} but expected type $clazz" }
         @Suppress("UNCHECKED_CAST")
         return reference as T
     }
@@ -114,11 +114,11 @@ class MarkupFile(
         myFixture.editor.caretModel.moveToOffset(offset)
         val (declaration, _) = com.intellij.model.psi.impl.targetDeclarationAndReferenceSymbols(myFixture.psiManager.findFile(vFile)!!, offset)
         assert(declaration.isNotEmpty()) {
-            "file $name: no declaration found at ${lineCol(offset)}"
+            "File $name: No declaration found at ${lineCol(offset)}"
         }
         val symbol = declaration.first()
         val element = PsiSymbolService.getInstance().extractElementFromSymbol(symbol).shouldNotBeNull {
-            "file $name: no psi found for declaration $symbol at ${lineCol(offset)}"
+            "File $name: No psi found for declaration $symbol at ${lineCol(offset)}"
         }
         return FindUsagesResult(element, myFixture.findUsages(element))
     }
@@ -131,13 +131,13 @@ class MarkupFile(
             expectedErrors.none { expectedError -> foundError.startOffset == translateMarkupToFile(expectedError.pos) }
         }
         check(unexpectedErrors.isEmpty()) {
-            "file $name: parsing failed unexpectedly with errors ${unexpectedErrors.map { """"${it.errorDescription}" at ${lineCol(it.startOffset)}""" }}"
+            "File $name: Parsing failed unexpectedly with errors ${unexpectedErrors.map { """"${it.errorDescription}" at ${lineCol(it.startOffset)}""" }}"
         }
         val notFoundExpectedErrors = expectedErrors.filter { expectedError ->
             foundErrors.none { foundError -> foundError.startOffset == translateMarkupToFile(expectedError.pos) }
         }
         check(notFoundExpectedErrors.isEmpty()) {
-            "file $name: parsing succeeded unexpectedly at ${notFoundExpectedErrors.map { lineCol(translateMarkupToFile(it.pos)) }}"
+            "File $name: Parsing succeeded unexpectedly at ${notFoundExpectedErrors.map { lineCol(translateMarkupToFile(it.pos)) }}"
         }
     }
 
@@ -151,7 +151,7 @@ class MarkupFile(
             myFixture.editor,
             TargetElementUtil.ELEMENT_NAME_ACCEPTED or TargetElementUtil.REFERENCED_ELEMENT_ACCEPTED
         ).shouldNotBeNull {
-            "file $name: no psi element to rename found at ${lineCol(offset)}"
+            "File $name: No psi element to rename found at ${lineCol(offset)}"
         }
         myFixture.renameElement(element, newName)
     }
@@ -170,7 +170,7 @@ class MarkupFile(
     fun getHintAt(offset: Int): String? {
         myFixture.openFileInEditor(vFile)
         val highlightingPass = InlayHintsPassFactory().createHighlightingPass(myFixture.file, myFixture.editor)
-            ?: throw AssertionError("no highlighting pass was constructed")
+            ?: throw AssertionError("No highlighting pass was constructed")
         highlightingPass.doCollectInformation(EmptyProgressIndicator())
         highlightingPass.doApplyInformationToEditor()
         val hints = myFixture.editor.inlayModel.getInlineElementsInRange(offset, offset).map {
@@ -178,7 +178,7 @@ class MarkupFile(
         }
         if (hints.isEmpty()) return null
         withClue({
-            "file $name: there should be only one hint at ${lineCol(offset)}"
+            "File $name: There should be only one hint at ${lineCol(offset)}"
         }) {
             hints shouldHaveSize 1
         }
@@ -202,7 +202,7 @@ class MarkupFile(
                 return LineCol(lineNr + 1, col + 1)
             }
         }
-        error("offset not in file")
+        error("Offset not in file")
     }
 
     fun executeIntentionAt(action: IntentionAction, offset: Int) {
@@ -231,7 +231,7 @@ class MarkupFile(
                 }
             }
             check(caretMap.isNotEmpty()) {
-                "No caret found in any file."
+                "No caret found in any file"
             }
             return caretMap.values
         }

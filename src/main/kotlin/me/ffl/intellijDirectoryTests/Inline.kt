@@ -7,7 +7,7 @@ val inlineExecutor: KotestExecutor = {
     val beforeDir = testDataPath / "before"
     val beforeFiles = beforeDir.loadProject()
     val (caretFile, caretOffset) = checkNotNull(beforeFiles.findCarets().singleOrNull()) {
-        "Inline tests must only have one caret."
+        "Inline tests must only have one caret"
     }
     caretFile.inlineAt(caretOffset)
     checkAfterProject()

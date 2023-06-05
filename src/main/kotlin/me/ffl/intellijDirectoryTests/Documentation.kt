@@ -11,8 +11,8 @@ val documentationExecutor: KotestExecutor = {
     projectFiles.findCarets().forEach { caret ->
         val doc = caret.file.getDocumentationAt(caret.offset)
         if (doc == null) {
-            if (caret.name == null) fail("no documentation found at nameless caret")
-            else fail("no documentation found at caret ${caret.name}")
+            if (caret.name == null) fail("No documentation found at nameless caret")
+            else fail("No documentation found at caret ${caret.name}")
         } else {
             val expected = (testDataPath / "result.html").readText()
             doc.trimEnd() shouldBe expected.trimEnd()

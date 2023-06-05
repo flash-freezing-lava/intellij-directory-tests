@@ -18,12 +18,12 @@ val renameExecutor: KotestExecutor = {
     try {
         caret.file.renameElementAt(caret.offset, newName)
         if (errorFile.exists()) {
-            fail("rename did not fail, when it was expected")
+            fail("Rename did not fail, when it was expected")
         }
         checkAfterProject()
     } catch (e: RefactoringErrorHintException) {
         if (!errorFile.exists()) {
-            fail("unexpected rename error: ${e.message}")
+            fail("Unexpected rename error: ${e.message}")
         } else {
             val expected = errorFile.readText()
             e.message shouldBe expected

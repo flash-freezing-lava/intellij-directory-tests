@@ -16,7 +16,7 @@ val actionExecutor: KotestExecutor = {
         "Action tests must only have one caret"
     }
     val intention = testDataPath.mapNotNull { config.knownIntentionMap[it.toString().simplifyIntentionName()] }.lastOrNull().shouldNotBeNull {
-        "test data path contains no Intention class name"
+        "Test data path contains no Intention class name"
     }
     try {
         caretFile.executeIntentionAt(intention, caretOffset)
@@ -25,7 +25,7 @@ val actionExecutor: KotestExecutor = {
         }
     } catch (e: RefactoringErrorHintException) {
         if (!errorFile.exists()) {
-            fail("unexpected intention error: ${e.message}")
+            fail("Unexpected intention error: ${e.message}")
         } else {
             val expected = errorFile.readText()
             e.message shouldBe expected

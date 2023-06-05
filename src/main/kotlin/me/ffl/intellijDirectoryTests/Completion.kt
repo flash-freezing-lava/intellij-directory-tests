@@ -42,7 +42,7 @@ private fun KotestExecutorContext.checkInternalPsi(caret: FoundCaret, projectFil
             val start = (referencedElement as? PsiNameIdentifierOwner)?.nameIdentifier ?: referencedElement
             if (start.startOffset !in wantedReferences) {
                 fail(
-                    """file ${markupFile.name}: ${referencedElement.javaClass.simpleName} at ${markupFile.lineCol(start.startOffset)}  was not supposed to be suggested"""
+                    """File ${markupFile.name}: ${referencedElement.javaClass.simpleName} at ${markupFile.lineCol(start.startOffset)}  was not supposed to be suggested"""
                 )
             }
             start.startOffset
@@ -51,14 +51,14 @@ private fun KotestExecutorContext.checkInternalPsi(caret: FoundCaret, projectFil
         foundTimes.forEach { (pos, times) ->
             if (times != 1) {
                 fail(
-                    "file ${markupFile.name}: element at position ${markupFile.lineCol(pos)} was suggested $times times"
+                    "File ${markupFile.name}: Element at position ${markupFile.lineCol(pos)} was suggested $times times"
                 )
             }
         }
         val missedReferences = wantedReferences.filter { it !in foundReferences }.map(markupFile::lineCol)
         if (missedReferences.isNotEmpty()) {
             fail(
-                "file ${markupFile.name}: elements at positions $missedReferences were not suggested"
+                "File ${markupFile.name}: Elements at positions $missedReferences were not suggested"
             )
         }
     }
@@ -74,18 +74,18 @@ private fun KotestExecutorContext.checkExternalPsi(caret: FoundCaret, externalRe
             val virtualFile = it.containingFile.virtualFile
             myFixture.openFileInEditor(virtualFile)
             val pos = myFixture.editor.offsetToLogicalPosition(it.startOffset)
-            name = "unknown element of type ${it.javaClass.simpleName} in file ${virtualFile.presentableName} at position ${pos.line}:${pos.column}"
-            fail("unexpected suggestion: $name")
+            name = "Unknown element of type ${it.javaClass.simpleName} in file ${virtualFile.presentableName} at position ${pos.line}:${pos.column}"
+            fail("Unexpected suggestion: $name")
         } else {
             if (name !in wantedExternalReferences) {
-                fail("unexpected suggestion: $name")
+                fail("Unexpected suggestion: $name")
             }
         }
         name
     }.toSet()
     val missingExternalReferences = wantedExternalReferences - foundExternalReferences
     if (missingExternalReferences.isNotEmpty()) {
-        fail("didn't suggest external language elements $missingExternalReferences")
+        fail("Didn't suggest external language elements $missingExternalReferences")
     }
 }
 

@@ -8,12 +8,12 @@ import kotlin.io.path.*
 val parserExecutor: KotestExecutor = {
     val inputFile = testDataPath.listDirectoryEntries().singleOrNull {
         (it.nameWithoutExtension == testName || it.nameWithoutExtension == "input") && it.extension != "txt"
-    } ?: error("no or multiple input files found")
+    } ?: error("No or multiple input files found")
     val txtFile = testDataPath / "$testName.txt"
     val inputMarkupFile = MarkupFile(myFixture, myFixture.createFile("${inputFile.fileName}", ""), inputFile.readText())
-    val inputPsiFile = myFixture.psiManager.findFile(inputMarkupFile.vFile) ?: error("markup file without psi file")
+    val inputPsiFile = myFixture.psiManager.findFile(inputMarkupFile.vFile) ?: error("Markup file without psi file")
     val inputFileExtension = inputFile.extension
-    assert(!(testDataPath / "allow_errors.txt").exists()) { "migrate outdated allow_errors.txt to newer <parse-error> format" }
+    assert(!(testDataPath / "allow_errors.txt").exists()) { "Migrate outdated allow_errors.txt to newer <parse-error> format" }
     inputMarkupFile.assertExactParsingErrors()
     if (!inputMarkupFile.expectsParseErrors) {
         ParsingTestUtil.ensureNoErrorElements(inputPsiFile)

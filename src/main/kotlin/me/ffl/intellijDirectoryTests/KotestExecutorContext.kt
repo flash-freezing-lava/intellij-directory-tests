@@ -47,20 +47,20 @@ class KotestExecutorContext(
                 }
                 val missingFiles = referenceFiles.filter { afterFile -> currentFiles.none { it.name == afterFile.name } }
                 if (missingFiles.isNotEmpty()) {
-                    fail("missed files ${missingFiles.map(afterRootPath::relativize)}")
+                    fail("Missed files ${missingFiles.map(afterRootPath::relativize)}")
                 }
             } else {
                 if (!referencePath.exists()) {
-                    fail("$relPath had no corresponding file in after project")
+                    fail("$relPath has no corresponding file in after project")
                 } else if (!referencePath.isFile()) {
-                    fail("$relPath was not a file in after project")
+                    fail("$relPath is not a file in after project")
                 } else {
                     myFixture.openFileInEditor(file)
                     val afterFileMarkup = MarkupFile(myFixture, null, referencePath.readText(), file.name)
                     try {
                         myFixture.checkResult(afterFileMarkup.code, false)
                     } catch (e: Throwable) {
-                        fail("unexpected content in file ${file.name}", e)
+                        fail("Unexpected content in file ${file.name}", e)
                     }
                     val requiredCarets = afterFileMarkup.findCarets()
                     // Use assert instead of kotest, because this is not an error in the tested plugin but in the test itself

@@ -26,13 +26,13 @@ val resolveExecutor: KotestExecutor = {
                 }.map { referencedElement ->
                     if (!reference.isReferenceTo(referencedElement)) {
                         fail(
-                            "file ${markupFile.name}: inconsistent isReferenceTo implementation in class ${reference.javaClass} referring to \"${referencedElement.text}\" of type ${referencedElement.javaClass.simpleName}"
+                            "File ${markupFile.name}: Inconsistent isReferenceTo implementation in class ${reference.javaClass} referring to \"${referencedElement.text}\" of type ${referencedElement.javaClass.simpleName}"
                         )
                     }
                     val start = (referencedElement as? PsiNameIdentifierOwner)?.nameIdentifier ?: referencedElement
                     if (start.startOffset !in wantedReferences) {
                         fail(
-                            """file ${markupFile.name}: reference to ${referencedElement.javaClass.simpleName} at ${markupFile.lineCol(start.startOffset)}  was not supposed to exist"""
+                            """File ${markupFile.name}: Reference to ${referencedElement.javaClass.simpleName} at ${markupFile.lineCol(start.startOffset)}  was not supposed to exist"""
                         )
                     }
                     start.startOffset
@@ -41,14 +41,14 @@ val resolveExecutor: KotestExecutor = {
                 foundTimes.forEach { (pos, times) ->
                     if (times != 1) {
                         fail(
-                            "file ${markupFile.name}: reference to position ${markupFile.lineCol(pos)} was found $times times"
+                            "File ${markupFile.name}: Reference to position ${markupFile.lineCol(pos)} was found $times times"
                         )
                     }
                 }
                 val missedReferences = wantedReferences.filter { it !in foundReferences }.map(markupFile::lineCol)
                 if (missedReferences.isNotEmpty()) {
                     fail(
-                        "file ${markupFile.name}: references to positions $missedReferences were not found"
+                        "File ${markupFile.name}: References to positions $missedReferences were not found"
                     )
                 }
             }
@@ -61,18 +61,18 @@ val resolveExecutor: KotestExecutor = {
                     val virtualFile = it.containingFile.virtualFile
                     myFixture.openFileInEditor(virtualFile)
                     val pos = myFixture.editor.offsetToLogicalPosition(it.startOffset)
-                    name = "unknown element of type ${it.javaClass.simpleName} in file ${virtualFile.presentableName} at position ${pos.line}:${pos.column}"
-                    fail("unexpected reference to $name")
+                    name = "Unknown element of type ${it.javaClass.simpleName} in file ${virtualFile.presentableName} at position ${pos.line}:${pos.column}"
+                    fail("Unexpected reference to $name")
                 } else {
                     if (name !in wantedExternalReferences) {
-                        fail("unexpected reference to $name")
+                        fail("Unexpected reference to $name")
                     }
                 }
                 name
             }.toSet()
             val missingExternalReferences = wantedExternalReferences - foundExternalReferences
             if (missingExternalReferences.isNotEmpty()) {
-                fail("didn't find references to external language elements $missingExternalReferences")
+                fail("Didn't find references to external language elements $missingExternalReferences")
             }
         }
     }
