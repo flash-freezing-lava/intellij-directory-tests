@@ -44,7 +44,7 @@ class MarkupFile(
             MarkupPoint(
                 matchResult.range.first,
                 matchResult.value.length,
-                matchResult.groups["type"]!!.value, // garanteed not-null, because the type regex is not optional
+                matchResult.groups["type"]!!.value, // guaranteed not-null, because the type regex is not optional
                 matchResult.groups["name"]?.value
             )
         }
