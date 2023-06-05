@@ -62,9 +62,12 @@ class KotestExecutorContext(
                     } catch (e: Throwable) {
                         fail("unexpected content in file ${file.name}", e)
                     }
-                    val requiredCaret = afterFileMarkup.findCaret() ?: return
+                    val requiredCarets = afterFileMarkup.findCarets()
+                    // Use assert instead of kotest, because this is not an error in the tested plugin but in the test itself
+                    check(requiredCarets.any { it.name != null } || requiredCarets.size <= 1) { "Multiple carets in result projects are not supported. Only use one caret without a name." }
+                    val requiredCaret = requiredCarets.firstOrNull() ?: return
                     openFileName shouldBe file.name
-                    requiredCaret shouldBeExactly caret
+                    requiredCaret.offset shouldBeExactly caret
                 }
             }
         }

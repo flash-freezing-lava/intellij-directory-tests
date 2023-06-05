@@ -2,7 +2,7 @@ package me.ffl.intellijDirectoryTests
 
 import com.intellij.refactoring.util.CommonRefactoringUtil.RefactoringErrorHintException
 import io.kotest.matchers.shouldBe
-import me.ffl.intellijDirectoryTests.MarkupFile.Companion.findCaret
+import me.ffl.intellijDirectoryTests.MarkupFile.Companion.findCarets
 import kotlin.io.path.div
 import kotlin.io.path.exists
 import kotlin.io.path.readText
@@ -11,7 +11,9 @@ val renameExecutor: KotestExecutor = {
     val beforeFiles = loadBeforeProject()
     val newName = (testDataPath / "new_name.txt").readText()
     val errorFile = testDataPath / "should_fail.txt"
-    val caret = beforeFiles.findCaret()
+    val caret = checkNotNull(beforeFiles.findCarets().singleOrNull()) {
+        "Rename tests must only have one caret"
+    }
 
     try {
         caret.file.renameElementAt(caret.offset, newName)

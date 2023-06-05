@@ -7,13 +7,14 @@ import com.intellij.refactoring.suggested.startOffset
 import io.kotest.assertions.withClue
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldNotContainDuplicates
-import me.ffl.intellijDirectoryTests.MarkupFile.Companion.findCaret
+import me.ffl.intellijDirectoryTests.MarkupFile.Companion.findCarets
 import kotlin.io.path.div
 import kotlin.io.path.exists
 import kotlin.io.path.readLines
 
-private fun KotestExecutorContext.checkNonPsi(nonPsiLookups: Set<String>) {
-    val nonPsiFilePath = testDataPath / "non_psi_items.txt"
+private fun KotestExecutorContext.checkNonPsi(caret: FoundCaret, nonPsiLookups: Set<String>) {
+    val fileName = if (caret.name == null) "non_psi_items.txt" else "non_psi_items_for_${caret.name}.txt"
+    val nonPsiFilePath = testDataPath / fileName
     val expectedNonPsi = if (nonPsiFilePath.exists()) nonPsiFilePath.readLines().toSet() else emptySet()
     val missingNonPsi = expectedNonPsi - nonPsiLookups
     withClue("Not all non-psi lookups were suggested by the auto-completion") {
@@ -25,16 +26,16 @@ private fun KotestExecutorContext.checkNonPsi(nonPsiLookups: Set<String>) {
     }
 }
 
-private fun KotestExecutorContext.checkPsi(projectFiles: List<MarkupFile>, psiLookUps: List<PsiElement>) {
+private fun KotestExecutorContext.checkPsi(caret: FoundCaret, projectFiles: List<MarkupFile>, psiLookUps: List<PsiElement>) {
     val projectVirtualFiles = projectFiles.map { it.vFile }
     val (internalReferences, externalReferences) = psiLookUps.partition { it.containingFile.virtualFile in projectVirtualFiles }
-    checkInternalPsi(projectFiles, internalReferences)
-    checkExternalPsi(externalReferences)
+    checkInternalPsi(caret, projectFiles, internalReferences)
+    checkExternalPsi(caret, externalReferences)
 }
 
-private fun KotestExecutorContext.checkInternalPsi(projectFiles: List<MarkupFile>, internalReferences: List<PsiElement>) {
+private fun KotestExecutorContext.checkInternalPsi(caret: FoundCaret, projectFiles: List<MarkupFile>, internalReferences: List<PsiElement>) {
     projectFiles.forEach { markupFile ->
-        val wantedReferences = markupFile.findWantedReferencePositions()
+        val wantedReferences = markupFile.findWantedReferencePositions(caret)
         val foundReferences = internalReferences.filter {
             it.containingFile.virtualFile == markupFile.vFile
         }.map { referencedElement ->
@@ -63,8 +64,9 @@ private fun KotestExecutorContext.checkInternalPsi(projectFiles: List<MarkupFile
     }
 }
 
-private fun KotestExecutorContext.checkExternalPsi(externalReferences: List<PsiElement>) {
-    val externalReferenceFile = testDataPath / "external suggestions.txt"
+private fun KotestExecutorContext.checkExternalPsi(caret: FoundCaret, externalReferences: List<PsiElement>) {
+    val fileName = if (caret.name == null) "external suggestions.txt" else "external suggestions for ${caret.name}.txt"
+    val externalReferenceFile = testDataPath / fileName
     val wantedExternalReferences = if (externalReferenceFile.exists()) externalReferenceFile.readLines().shouldNotContainDuplicates().toSet() else emptySet()
     val foundExternalReferences = externalReferences.map {
         var name: String? = config.externalReferenceToString(it)
@@ -91,15 +93,16 @@ val completionExecutor: KotestExecutor = {
     CodeInsightSettings.getInstance().AUTOCOMPLETE_ON_CODE_COMPLETION = false
     CodeInsightSettings.getInstance().AUTOCOMPLETE_ON_SMART_TYPE_COMPLETION = false
     val projectFiles = testDataPath.loadProject()
-    val caret = projectFiles.findCaret()
-    val results = checkNotNull(caret.file.executeCompletionAt(caret.offset)) {
-        "Test code failed to disable autocompletion"
-    }
+    projectFiles.findCarets().forEach { caret ->
+        val results = checkNotNull(caret.file.executeCompletionAt(caret.offset)) {
+            "Test code failed to disable autocompletion"
+        }
 
-    val nonPsiLookups = results.filter { it.psiElement == null }.map { it.lookupString }.toSet()
-    checkNonPsi(nonPsiLookups)
-    val psiLookUps = results.mapNotNull { it.psiElement }
-    checkPsi(projectFiles, psiLookUps)
+        val nonPsiLookups = results.filter { it.psiElement == null }.map { it.lookupString }.toSet()
+        checkNonPsi(caret, nonPsiLookups)
+        val psiLookUps = results.mapNotNull { it.psiElement }
+        checkPsi(caret, projectFiles, psiLookUps)
+    }
 
     CodeInsightSettings.getInstance().AUTOCOMPLETE_ON_CODE_COMPLETION = true
     CodeInsightSettings.getInstance().AUTOCOMPLETE_ON_SMART_TYPE_COMPLETION = true

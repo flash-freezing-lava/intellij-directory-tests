@@ -77,6 +77,26 @@ If you test only kotlin code, you can use the following lambda
 { (it as? KtElement)?.fqName }
 ```
 
+## Multiple carets
+Instead of writing `<caret>` and `<ref>` for resolve tests,
+you can also give names to the caret.
+
+```rust
+#[cfg_attr(feature = "serde-kebab", serde(rename_all = "kebab-case"))]
+#[cfg_attr(feature = "serde-upper", serde(rename_all = "UPPERCASE"))]
+enum MyEnum {
+    <ref var1><ref var2>MyVariant,
+}
+
+// language = ron
+const = "<caret var1>my-variant";
+// language = ron
+const = "<caret var2>MYVARIANT";
+```
+
+For separation of concerns, it is generally discouraged to combine tests in this way.
+However, it can be useful, to make certain, a testcase is not accidentally passed, because of the internals of a pseudo-randomized data-structure like the iteration order of a hashmap.
+
 ## License
 
 Copyright 2023 Lars Frost <freezinglava@proton.me>

@@ -1,12 +1,14 @@
 package me.ffl.intellijDirectoryTests
 
-import me.ffl.intellijDirectoryTests.MarkupFile.Companion.findCaret
+import me.ffl.intellijDirectoryTests.MarkupFile.Companion.findCarets
 import kotlin.io.path.div
 
 val inlineExecutor: KotestExecutor = {
     val beforeDir = testDataPath / "before"
     val beforeFiles = beforeDir.loadProject()
-    val (caretFile, caretOffset) = beforeFiles.findCaret()
+    val (caretFile, caretOffset) = checkNotNull(beforeFiles.findCarets().singleOrNull()) {
+        "Inline tests must only have one caret."
+    }
     caretFile.inlineAt(caretOffset)
     checkAfterProject()
 }

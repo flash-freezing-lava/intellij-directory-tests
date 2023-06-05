@@ -26,7 +26,7 @@ class MarkupFile(
     private val markup: String,
     val name: String
 ) {
-    private val refPattern = "<(ref|caret|usage|parse-error)>"
+    private val refPattern = "<(?<type>ref|caret|usage|parse-error)(?<name> [a-zA-Z_0-9]*)?>"
     private val points: List<MarkupPoint>
     val code: String
     val vFile: VirtualFile
@@ -44,7 +44,8 @@ class MarkupFile(
             MarkupPoint(
                 matchResult.range.first,
                 matchResult.value.length,
-                matchResult.groupValues[1]
+                matchResult.groups["type"]!!.value, // garanteed not-null, because the type regex is not optional
+                matchResult.groups["name"]?.value
             )
         }
         code = constructCode()
@@ -81,18 +82,18 @@ class MarkupFile(
         return res
     }
 
-    fun findCaret(): Int? {
-        val carets = points.filter { it.type == "caret" }
-        require(carets.size <= 1) { "found multiple carets in file" }
-        return carets.firstOrNull()?.pos?.let(this::translateMarkupToFile)
+    fun findCarets(): List<FoundCaret> {
+        return points
+            .filter { it.type == "caret" }
+            .map { FoundCaret(this, translateMarkupToFile(it.pos), it.name) }
     }
 
-    fun findWantedReferencePositions(): List<Int> {
-        return points.filter { it.type == "ref" }.map { translateMarkupToFile(it.pos) }
+    fun findWantedReferencePositions(caret: FoundCaret): List<Int> {
+        return points.filter { it.type == "ref" && it.name == caret.name }.map { translateMarkupToFile(it.pos) }
     }
 
-    fun findWantedUsagesPositions(): List<Int> {
-        return points.filter { it.type == "usage" }.map { translateMarkupToFile(it.pos) }
+    fun findWantedUsagesPositions(caret: FoundCaret): List<Int> {
+        return points.filter { it.type == "usage" && it.name == caret.name }.map { translateMarkupToFile(it.pos) }
     }
 
     @JvmName("findReferenceAtWithDefaultGeneric")
@@ -219,17 +220,20 @@ class MarkupFile(
     /**
      * @param pos Position in the markup file, **not** in the unescaped code
      */
-    private data class MarkupPoint(val pos: Int, val len: Int, val type: String)
+    private data class MarkupPoint(val pos: Int, val len: Int, val type: String, val name: String?)
 
     companion object {
-        fun List<MarkupFile>.findCaret(): FoundCaret {
-            val carets = mapNotNull { file -> file.findCaret()?.let { FoundCaret(file, it) } }
-            check(carets.size <= 1) {
-                "multiple files had a caret: ${carets.map { "${it.file.name}:${it.file.lineCol(it.offset)}" }}"
+        fun List<MarkupFile>.findCarets(): Collection<FoundCaret> {
+            val carets = flatMap { file -> file.findCarets() }.groupBy { it.name }
+            val caretMap = carets.mapValues {
+                checkNotNull(it.value.singleOrNull()) {
+                    "The name ${it.key} was used for multiple carets. Caret names must be unique."
+                }
             }
-            return checkNotNull(carets.firstOrNull()) {
-                "no caret found in any file"
+            check(caretMap.isNotEmpty()) {
+                "No caret found in any file."
             }
+            return caretMap.values
         }
     }
 }
@@ -242,4 +246,4 @@ data class LineCol(val line: Int, val col: Int) {
 
 data class FindUsagesResult(val definitionElement: PsiElement, val usages: Collection<UsageInfo>)
 
-data class FoundCaret(val file: MarkupFile, val offset: Int)
+data class FoundCaret(val file: MarkupFile, val offset: Int, val name: String?)
