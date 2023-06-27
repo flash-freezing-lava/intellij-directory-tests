@@ -102,7 +102,7 @@ abstract class DirectoryTests(config: DirectoryTestConfig = DirectoryTestConfig.
                             test(testName) {
                                 setupTest(testName, executorName in config.needsHeavyTestRunner)
                                 val context = config.createContext(testName, testDataPath, myFixture!!)
-                                if (executorName in config.needsNoWriteAction) {
+                                if (executorName in config.useNoWriteAction) {
                                     // don't create application in EDT
                                     TestApplicationManager.getInstance()
                                     val policy = IdeaTestExecutionPolicy.current()

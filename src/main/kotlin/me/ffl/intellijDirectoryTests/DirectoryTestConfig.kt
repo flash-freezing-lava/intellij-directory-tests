@@ -10,7 +10,7 @@ import kotlin.io.path.Path
 data class DirectoryTestConfig(
     val kotestExecutors: Map<String, KotestExecutor>,
     val needsHeavyTestRunner: Set<String>,
-    val needsNoWriteAction: Set<String>,
+    val useNoWriteAction: Set<String>,
     val testDataPath: Path,
     val knownIntentions: List<IntentionAction>,
     /**
@@ -60,7 +60,16 @@ data class DirectoryTestConfig(
         val default = DirectoryTestConfig(
             defaultKotestExecutors,
             emptySet(),
-            emptySet(),
+            setOf(
+                "documentation",
+                "find usages",
+                // Unintuitively, actions must not be called in a write action.
+                // They start a write action themselves and dispatch UI events before that,
+                // which makes test fails, because UI events must not get dispatched in a write action.
+                "actions",
+                "resolve",
+                "hints",
+            ), // actionExecutor
             defaultTestDataPath,
             emptyList(),
             false,
