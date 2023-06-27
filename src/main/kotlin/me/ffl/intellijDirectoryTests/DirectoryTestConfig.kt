@@ -9,7 +9,14 @@ import kotlin.io.path.Path
 
 data class DirectoryTestConfig(
     val kotestExecutors: Map<String, KotestExecutor>,
+    /**
+     * Set of test executors, that require actual files in /tmp, for example because they run external tools on the files.
+     * For other test executors lighter in-memory files are used.
+     */
     val needsHeavyTestRunner: Set<String>,
+    /**
+     * Set of test executors, that should not be wrapped into a write action.
+     */
     val useNoWriteAction: Set<String>,
     val testDataPath: Path,
     val knownIntentions: List<IntentionAction>,
