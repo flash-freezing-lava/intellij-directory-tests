@@ -26,7 +26,7 @@ class MarkupFile(
     private val markup: String,
     val name: String
 ) {
-    private val refPattern = "<(?<type>ref|caret|usage|parse-error)(?<name> [a-zA-Z_0-9]*)?>"
+    private val refPattern = "<(?<type>ref|caret|usage|parse-error)(?<name> [a-zA-Z_0-9]+)?>"
     private val points: List<MarkupPoint>
     val code: String
     val vFile: VirtualFile
