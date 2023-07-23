@@ -61,6 +61,7 @@ data class DirectoryTestConfig(
             "hints" to hintsExecutor,
             "inline" to inlineExecutor,
             "completion" to completionExecutor,
+            "executed completion" to executedCompletionExecutor,
         )
         private val defaultTestDataPath = Path("src/test/testData")
         val denyAllExternalReferences: (PsiElement) -> String? = { null }
@@ -76,7 +77,8 @@ data class DirectoryTestConfig(
                 "actions",
                 "resolve",
                 "hints",
-            ), // actionExecutor
+                "executed completion",
+            ),
             defaultTestDataPath,
             emptyList(),
             false,
