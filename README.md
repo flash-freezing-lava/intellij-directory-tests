@@ -21,10 +21,10 @@ dependencies {
     testImplementation("io.github.flash-freezing-lava", "intellij-directory-tests", dirTestVersion)
 }
 
-val unitTestTask = task<Test>("dirTest") {
-    isScanForTestClasses = false
-    include("org/your/packageName/*Test.class")
-    useJUnitPlatform()
+tasks {
+    test {
+        useJUnitPlatform()
+    }
 }
 ```
 
