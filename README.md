@@ -15,7 +15,7 @@ You can then follow the below instructions.
 
 ## Including directory tests in your project
 
-Add the following to your `build.gradle.kts` and replace dirTestVersion with the current version and `org/your/test/packageName` with the path to your package:
+Add the following to your `build.gradle.kts` and replace `dirTestVersion` with the current version:
 ```kotlin
 dependencies {
     testImplementation("io.github.flash-freezing-lava", "intellij-directory-tests", dirTestVersion)
@@ -65,16 +65,16 @@ data class <ref>Abc(val f: Int)
 typealias Foo = <caret>Abc
 ```
 
-If references are ambiguous and resolve to multiple symbols, you just mark multiple symbols with `ref`.
+If references are ambiguous and should resolve to multiple symbols, just mark multiple symbols with `ref`.
 
 If a reference should resolve to an external symbol,
 you can create a file named `external_references.txt` in the test directory, with the fully-qualified names of the symbols.
 You then have to adapt the `externalReferenceToString` function in your `DirectoryTestConfig` to yield the fully-qualified names, for the expected psi elements.
 
 Example:  
-If you test only kotlin code, you can use the following lambda
+If you test only kotlin code, you can use the following lambda for `DirectoryTestConfig::externalReferenceToString`
 ```kotlin
-{ (it as? KtElement)?.fqName }
+{ (it as? KtElement)?.fqName?.toString() }
 ```
 
 ## Multiple carets
@@ -85,13 +85,13 @@ you can also give names to the caret.
 #[cfg_attr(feature = "serde-kebab", serde(rename_all = "kebab-case"))]
 #[cfg_attr(feature = "serde-upper", serde(rename_all = "UPPERCASE"))]
 enum MyEnum {
-    <ref var1><ref var2>MyVariant,
+  <ref var1><ref var2>MyVariant,
 }
 
-// language = ron
-const = "<caret var1>my-variant";
-// language = ron
-const = "<caret var2>MYVARIANT";
+// language=RON
+const STR1: &str = "<caret var1>my-variant";
+// language=RON
+const STR2: &str = "<caret var2>MYVARIANT";
 ```
 
 For separation of concerns, it is generally discouraged to combine tests in this way.
