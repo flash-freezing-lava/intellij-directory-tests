@@ -1,5 +1,15 @@
 # Directory-based Test Framework for Intellij Plugins
 
+## Version compatibility
+
+
+| Intellij | Directory tests |
+|----------|-----------------|
+| 2023.1   | 0.1.0           |
+| 2023.2   | 0.2.0           |
+
+
+
 ## Code Setup
 
 For now, you will have to build the plugin locally, because it is not published on any maven repo.
