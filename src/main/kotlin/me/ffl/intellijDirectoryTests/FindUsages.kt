@@ -18,7 +18,7 @@ val findUsagesExecutor: KotestExecutor = {
                 val usingElementsInThisFile = usages.filter { it.element!!.containingFile.virtualFile == markupFile.vFile }
                 val foundReferences = usingElementsInThisFile.map { usage ->
                     val usingElement = usage.element
-                    val start = +usingElement!!.startOffset + (usage.rangeInElement?.startOffset ?: 0)
+                    val start = usingElement!!.startOffset + (usage.rangeInElement?.startOffset ?: 0)
                     val lineCol = markupFile.lineCol(start)
                     val reference = usingElement.reference
                     if (reference == null) {
