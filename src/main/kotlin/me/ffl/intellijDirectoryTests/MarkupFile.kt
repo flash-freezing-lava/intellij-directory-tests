@@ -76,7 +76,7 @@ class MarkupFile(
     private fun translateFileToMarkup(pos: Int): Int {
         var res = pos
         for (point in points) {
-            if (point.pos > pos) break
+            if (point.pos > res) break
             res += point.len
         }
         return res
