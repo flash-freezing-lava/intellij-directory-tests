@@ -1,5 +1,7 @@
 # Directory-based Test Framework for Intellij Plugins
 
+![Maven Central](https://img.shields.io/maven-central/v/io.github.flash-freezing-lava/intellij-directory-tests)
+
 ## Version compatibility
 
 
@@ -10,22 +12,9 @@
 
 
 
-## Code Setup
-
-For now, you will have to build the plugin locally, because it is not published on any maven repo.
-First initialize the gradle wrapper with `gradle wrapper`.
-Then use `./gradlew publishToLocalMaven` to install intellij-directory-tests.
-Afterwards, add the following lines to your `build.gradle.kts` file:
-```kotlin
-repositories {
-    mavenLocal()
-}
-```
-You can then follow the below instructions.
-
 ## Including directory tests in your project
 
-Add the following to your `build.gradle.kts` and replace `dirTestVersion` with the current version:
+Add the following to your `build.gradle.kts` and replace `dirTestVersion` with the current version ![Maven Central](https://img.shields.io/maven-central/v/io.github.flash-freezing-lava/intellij-directory-tests):
 ```kotlin
 dependencies {
     testImplementation("io.github.flash-freezing-lava", "intellij-directory-tests", dirTestVersion)
