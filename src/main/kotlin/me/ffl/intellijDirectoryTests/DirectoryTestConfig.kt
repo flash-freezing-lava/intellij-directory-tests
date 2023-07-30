@@ -11,7 +11,7 @@ data class DirectoryTestConfig(
     val kotestExecutors: Map<String, KotestExecutor>,
     /**
      * Set of test executors, that require actual files in /tmp, for example because they run external tools on the files.
-     * For other test executors lighter in-memory files are used.
+     * For other test executors, lighter in-memory files are used.
      */
     val needsHeavyTestRunner: Set<String>,
     /**
@@ -22,21 +22,20 @@ data class DirectoryTestConfig(
     val knownIntentions: List<IntentionAction>,
     /**
      * If true (by default this is false), the files specifying expected parser output is overridden with the actual output.
-     * This is useful, if you prefer to use `git diff` or intellij's diff view instead of clicking through all tests.
+     * This is useful, if you prefer to use `git diff` or intellij's diff view, to check the correctness of changed parser output.
      * Obviously, you should `git restore` the files, if the output did not change in the intended way.
      */
     val overrideParserOutput: Boolean,
     /**
      * This function is used to check, whether a reference to a psi element outside the project,
      * corresponds to an entry of `external references.txt`.
-     * This has cannot be implemented by intellijDirectoryTests, because it is specific to the tested language.
+     * This cannot be implemented by intellijDirectoryTests, because it is specific to the tested language.
      * If the function returns null, the PsiElement cannot correspond to any entry.
-     * This can be used f.e. if the element has no name or is in a file of unknown language.
      */
     val externalReferenceToString: (PsiElement) -> String?,
     val projectDescriptor: LightProjectDescriptor?,
     /**
-     * Configure kotest to continue on assertion errors and show all errors at last, instead of stopping at the first error.
+     * Configure kotest to continue on assertion errors and show all errors, instead of stopping at the first error.
      */
     val softAssertByDefault: Boolean,
 ) {
