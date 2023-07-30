@@ -50,6 +50,34 @@ publishing {
             version = projectVersion
 
             from(components["java"])
+
+            pom {
+                name.set("Intellij Directory Tests")
+                description.set("A test framework, that runs tests specified by directories with markup files")
+                url.set("https://github.com/flash-freezing-lava/intellij-directory-tests")
+                licenses {
+                    license {
+                        name.set("The Apache License, Version 2.0")
+                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                    }
+                    license {
+                        name.set("The MIT License")
+                        url.set("http://www.opensource.org/licenses/mit-license.php")
+                    }
+                }
+                developers {
+                    developer {
+                        id.set("freezinglava")
+                        name.set("Lars Frost")
+                        email.set("freezinglava@proton.me")
+                    }
+                }
+                scm {
+                    connection.set("scm:git:git://github.com/flash-freezing-lava/intellij-directory-tests.git")
+                    developerConnection.set("scm:git:ssh://github.com:flash-freezing-lava/intellij-directory-tests.git")
+                    url.set("https://github.com/flash-freezing-lava/intellij-directory-tests")
+                }
+            }
         }
     }
 }
