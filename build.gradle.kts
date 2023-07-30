@@ -1,5 +1,8 @@
 import org.gradle.api.tasks.wrapper.Wrapper.DistributionType
 
+val ossrhUsername: String by project
+val ossrhPassword: String by project
+
 plugins {
     kotlin("jvm") version "1.8.20"
     `java-library`
@@ -78,6 +81,18 @@ publishing {
                     developerConnection.set("scm:git:ssh://github.com:flash-freezing-lava/intellij-directory-tests.git")
                     url.set("https://github.com/flash-freezing-lava/intellij-directory-tests")
                 }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            name = "SonatypeMaven"
+
+            url = uri(if (version.toString().endsWith("-SNAPSHOT")) "https://s01.oss.sonatype.org/content/repositories/snapshots/" else "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+            credentials {
+                username = ossrhUsername
+                password = ossrhPassword
             }
         }
     }
