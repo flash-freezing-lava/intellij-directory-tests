@@ -4,6 +4,7 @@ plugins {
     kotlin("jvm") version "1.8.20"
     `java-library`
     `maven-publish`
+    signing
 }
 
 group = "me.ffl"
@@ -80,6 +81,11 @@ publishing {
             }
         }
     }
+}
+
+signing {
+    useGpgCmd()
+    sign(publishing.publications["maven"])
 }
 
 kotlin {
