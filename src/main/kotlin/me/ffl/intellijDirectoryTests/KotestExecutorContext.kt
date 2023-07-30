@@ -6,9 +6,9 @@ import com.intellij.testFramework.VfsTestUtil
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.util.io.isDirectory
 import com.intellij.util.io.isFile
-import io.kotest.assertions.collectOrThrow
-import io.kotest.assertions.errorCollector
-import io.kotest.assertions.failure
+import io.kotest.assertions.*
+import io.kotest.assertions.print.Printed
+import io.kotest.assertions.print.printed
 import io.kotest.matchers.ints.shouldBeExactly
 import io.kotest.matchers.shouldBe
 import java.nio.file.Path
@@ -57,11 +57,12 @@ class KotestExecutorContext(
                 } else {
                     myFixture.openFileInEditor(file)
                     val afterFileMarkup = MarkupFile(myFixture, null, referencePath.readText(), file.name)
-                    try {
-                        myFixture.checkResult(afterFileMarkup.code, false)
-                    } catch (e: Throwable) {
-                        fail("Unexpected content in file ${file.name}", e)
+                    val expected = afterFileMarkup.code
+                    val actual = myFixture.editor.document.text
+                    if (expected != actual) {
+                        errorCollector.collectOrThrow(failure(Expected(Printed(expected)), Actual(Printed(actual)), "Unexpected content in file ${file.name}:\n"))
                     }
+
                     val requiredCarets = afterFileMarkup.findCarets()
                     // Use assert instead of kotest, because this is not an error in the tested plugin but in the test itself
                     check(requiredCarets.any { it.name != null } || requiredCarets.size <= 1) { "Multiple carets in result projects are not supported. Only use one caret without a name." }
