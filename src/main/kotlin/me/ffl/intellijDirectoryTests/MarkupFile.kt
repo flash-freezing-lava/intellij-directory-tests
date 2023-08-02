@@ -5,19 +5,27 @@ import com.intellij.codeInsight.documentation.DocumentationManager
 import com.intellij.codeInsight.hints.InlayHintsPassFactory
 import com.intellij.codeInsight.intention.IntentionAction
 import com.intellij.codeInsight.lookup.LookupElement
+import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.model.psi.PsiSymbolService
 import com.intellij.openapi.progress.EmptyProgressIndicator
+import com.intellij.openapi.util.TextRange
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiErrorElement
+import com.intellij.psi.PsiFile
+import com.intellij.psi.PsiLanguageInjectionHost
+import com.intellij.psi.PsiLanguageInjectionHost.Shred
 import com.intellij.psi.PsiPolyVariantReference
+import com.intellij.psi.impl.source.tree.injected.InjectedFileViewProvider
 import com.intellij.psi.util.descendantsOfType
 import com.intellij.refactoring.suggested.startOffset
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.usageView.UsageInfo
 import io.kotest.assertions.withClue
 import io.kotest.matchers.collections.shouldHaveSize
+import org.intellij.lang.annotations.Language
 import kotlin.reflect.KClass
 
 class MarkupFile(
@@ -99,18 +107,50 @@ class MarkupFile(
     @JvmName("findReferenceAtWithDefaultGeneric")
     fun findReferenceAt(offset: Int): PsiPolyVariantReference? = findReferenceAt(PsiPolyVariantReference::class, offset)
 
-    private fun <T : PsiPolyVariantReference> findReferenceAt(clazz: KClass<T>, offset: Int): T? {
+    private fun getInjectedFileAnsOffset(offset: Int): Pair<PsiFile, Int> {
         myFixture.openFileInEditor(vFile)
-        val reference = myFixture.file.findReferenceAt(offset) ?: return null
-        assert(clazz.isInstance(reference)) { "Found reference of type ${reference.javaClass} but expected type $clazz" }
+        // Commit is necessary for InjectedLanguageManager.findInjectedElementAt to have defined behavior
+        PsiDocumentManager.getInstance(myFixture.project).commitAllDocuments()
+        val injectedLanguageManager = InjectedLanguageManager.getInstance(myFixture.project)
+        var injectedFile: PsiFile = myFixture.file
+        var injectedOffset: Int = offset
+        var lastHost: PsiLanguageInjectionHost? = null
+        while (true) {
+            val injectedElement = injectedLanguageManager.findInjectedElementAt(myFixture.file, offset) ?: break
+            val host = injectedLanguageManager.getInjectionHost(injectedElement) ?: break
+            if (host == lastHost) break
+            val escapedOffsetInInjectedHost = injectedOffset - host.textOffset
+            val (file, shreds) = buildList<Pair<PsiFile, List<Shred>>> {
+                injectedLanguageManager.enumerate(host) { file, shreds ->
+                    this += file to shreds
+                }
+            }.firstOrNull() ?: break
+            injectedFile = file
+            val shred = shreds.single { shred ->
+                escapedOffsetInInjectedHost in shred.rangeInsideHost
+            }
+            // This out-commented code could determine the corresponding unescaped code
+            // However, since PsiElement.text currently gives the escaped text, despite the parser analyzing the unescaped,
+            // it is not needed, and we should use the offset in the escaped text.
+//            val unescaped = StringBuilder()
+//            escaper.decode(TextRange(shred.rangeInsideHost.startOffset, escapedOffsetInInjectedHost), unescaped)
+            injectedOffset = shred.prefix.length + escapedOffsetInInjectedHost
+            lastHost = host
+        }
+        return injectedFile to injectedOffset
+    }
+
+    private fun <T : PsiPolyVariantReference> findReferenceAt(clazz: KClass<T>, offset: Int): T? {
+        val (injectedFile, injectedOffset) = getInjectedFileAnsOffset(offset)
+        val reference = injectedFile.findReferenceAt(injectedOffset) ?: return null
+        assert(clazz.isInstance(reference)) { "File $name: Found reference of type ${reference.javaClass} at ${lineCol(offset)} but expected type $clazz" }
         @Suppress("UNCHECKED_CAST")
         return reference as T
     }
 
     fun findUsagesAt(offset: Int): FindUsagesResult {
-        myFixture.openFileInEditor(vFile)
-        myFixture.editor.caretModel.moveToOffset(offset)
-        val (declaration, _) = com.intellij.model.psi.impl.targetDeclarationAndReferenceSymbols(myFixture.psiManager.findFile(vFile)!!, offset)
+        val (injectedFile, injectedOffset) = getInjectedFileAnsOffset(offset)
+        val (declaration, _) = com.intellij.model.psi.impl.targetDeclarationAndReferenceSymbols(injectedFile, injectedOffset)
         assert(declaration.isNotEmpty()) {
             "File $name: No declaration found at ${lineCol(offset)}"
         }
@@ -155,8 +195,8 @@ class MarkupFile(
     }
 
     fun getDocumentationAt(offset: Int): String? {
-        myFixture.openFileInEditor(vFile)
-        val originalElement = myFixture.file.findElementAt(offset).shouldNotBeNull { "no element found at caret" }
+        val (injectedFile, injectedOffset) = getInjectedFileAnsOffset(offset)
+        val originalElement = injectedFile.findElementAt(injectedOffset).shouldNotBeNull { "no element found at caret" }
         // while deprecated, this is still the recommended way from https://plugins.jetbrains.com/docs/intellij/documentation-test.html#define-a-test-method
         // unless JetBrains tells how to replace it, I will stick to it
         val target = DocumentationManager.getInstance(myFixture.project)
