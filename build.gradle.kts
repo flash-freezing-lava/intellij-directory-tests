@@ -1,7 +1,7 @@
 import org.gradle.api.tasks.wrapper.Wrapper.DistributionType
 
-val ossrhUsername: String by project
-val ossrhPassword: String by project
+val ossrhUsername: String? by project
+val ossrhPassword: String? by project
 
 plugins {
     kotlin("jvm") version "1.8.20" // See https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library for the correct version
