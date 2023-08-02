@@ -14,8 +14,15 @@ val resolveExecutor: KotestExecutor = {
     projectFiles.findCarets().forEach { caret ->
         withClue(if (caret.name == null) "Resolve nameless caret" else "Resolve caret ${caret.name}") {
             val reference = caret.file.findReferenceAt(caret.offset)
-            val referencedElements = reference.multiResolve(false).map {
-                it.element.shouldNotBeNull { "A ResolveResult had no element" }
+            val hasNoReference = projectFiles.all { it.findWantedReferencePositions(caret).isEmpty() } && getWantedExternalReferences().isEmpty()
+            val referencedElements = if (hasNoReference) {
+                emptyList()
+            } else {
+                reference.shouldNotBeNull {
+                    "File ${caret.file.name}: No reference found at offset ${caret.file.lineCol(caret.offset)}"
+                }.multiResolve(false).map {
+                    it.element.shouldNotBeNull { "File ${caret.file.name}:${caret.file.lineCol(caret.offset)}: A ResolveResult had no element" }
+                }
             }
             val projectVirtualFiles = projectFiles.map { it.vFile }
             val (internalReferences, externalReferences) = referencedElements.partition { it.containingFile.virtualFile in projectVirtualFiles }
@@ -24,16 +31,18 @@ val resolveExecutor: KotestExecutor = {
                 val foundReferences = internalReferences.filter {
                     it.containingFile.virtualFile == markupFile.vFile
                 }.map { referencedElement ->
-                    if (!reference.isReferenceTo(referencedElement)) {
-                        fail(
-                            "File ${markupFile.name}: Inconsistent isReferenceTo implementation in class ${reference.javaClass} referring to \"${referencedElement.text}\" of type ${referencedElement.javaClass.simpleName}"
-                        )
-                    }
                     val start = (referencedElement as? PsiNameIdentifierOwner)?.nameIdentifier ?: referencedElement
                     if (start.startOffset !in wantedReferences) {
                         fail(
                             """File ${markupFile.name}: Reference to ${referencedElement.javaClass.simpleName} at ${markupFile.lineCol(start.startOffset)}  was not supposed to exist"""
                         )
+                    }
+                    if (reference != null) {
+                        if (!reference.isReferenceTo(referencedElement)) {
+                            fail(
+                                "File ${markupFile.name}: Inconsistent isReferenceTo implementation in class ${reference.javaClass} referring to \"${referencedElement.text}\" of type ${referencedElement.javaClass.simpleName}"
+                            )
+                        }
                     }
                     start.startOffset
                 }
@@ -53,8 +62,7 @@ val resolveExecutor: KotestExecutor = {
                 }
             }
 
-            val externalReferenceFile = testDataPath / "external references.txt"
-            val wantedExternalReferences = if (externalReferenceFile.exists()) externalReferenceFile.readLines().shouldNotContainDuplicates().toSet() else emptySet()
+            val wantedExternalReferences = getWantedExternalReferences()
             val foundExternalReferences = externalReferences.map {
                 var name: String? = config.externalReferenceToString(it)
                 if (name == null) {
@@ -76,4 +84,10 @@ val resolveExecutor: KotestExecutor = {
             }
         }
     }
+}
+
+private fun KotestExecutorContext.getWantedExternalReferences(): Set<String> {
+    val externalReferenceFile = testDataPath / "external references.txt"
+    return if (externalReferenceFile.exists()) externalReferenceFile.readLines().shouldNotContainDuplicates()
+        .toSet() else emptySet()
 }

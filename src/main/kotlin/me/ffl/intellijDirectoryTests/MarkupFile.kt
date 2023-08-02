@@ -97,13 +97,11 @@ class MarkupFile(
     }
 
     @JvmName("findReferenceAtWithDefaultGeneric")
-    fun findReferenceAt(offset: Int): PsiPolyVariantReference = findReferenceAt(PsiPolyVariantReference::class, offset)
+    fun findReferenceAt(offset: Int): PsiPolyVariantReference? = findReferenceAt(PsiPolyVariantReference::class, offset)
 
-    private fun <T : PsiPolyVariantReference> findReferenceAt(clazz: KClass<T>, offset: Int): T {
+    private fun <T : PsiPolyVariantReference> findReferenceAt(clazz: KClass<T>, offset: Int): T? {
         myFixture.openFileInEditor(vFile)
-        val reference = myFixture.file.findReferenceAt(offset).shouldNotBeNull {
-            "No reference found at offset ${lineCol(offset)}"
-        }
+        val reference = myFixture.file.findReferenceAt(offset) ?: return null
         assert(clazz.isInstance(reference)) { "Found reference of type ${reference.javaClass} but expected type $clazz" }
         @Suppress("UNCHECKED_CAST")
         return reference as T

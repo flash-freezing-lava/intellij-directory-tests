@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 - File content difference was not shown in the error message, when comparing files to the expected file after a mutating operation
+- Error is shown when no reference was found, even when the caret shouldn't resolve to anything
 
 ## [0.2.1] 2023-07-30
 
