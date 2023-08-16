@@ -11,6 +11,7 @@ import io.kotest.assertions.print.Printed
 import io.kotest.assertions.print.printed
 import io.kotest.matchers.ints.shouldBeExactly
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldHave
 import java.nio.file.Path
 import kotlin.io.path.*
 
@@ -67,8 +68,12 @@ class KotestExecutorContext(
                     // Use assert instead of kotest, because this is not an error in the tested plugin but in the test itself
                     check(requiredCarets.any { it.name != null } || requiredCarets.size <= 1) { "Multiple carets in result projects are not supported. Only use one caret without a name." }
                     val requiredCaret = requiredCarets.firstOrNull() ?: return
-                    openFileName shouldBe file.name
-                    requiredCaret.offset shouldBeExactly caret
+                    withClue("Caret in unexpected file") {
+                        openFileName shouldBe file.name
+                    }
+                    if (requiredCaret.offset != caret) {
+                        failure(Expected(Printed(afterFileMarkup.lineCol(caret).toString())), Actual(Printed(afterFileMarkup.lineCol(requiredCaret.offset).toString())), "Caret in unexpected position")
+                    }
                 }
             }
         }
