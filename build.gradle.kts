@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "me.ffl"
-version = "0.2.2-SNAPSHOT"
+version = "0.2.2"
 
 repositories {
     mavenCentral()
