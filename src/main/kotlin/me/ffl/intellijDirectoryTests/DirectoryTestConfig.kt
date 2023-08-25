@@ -61,6 +61,7 @@ data class DirectoryTestConfig(
             "inline" to inlineExecutor,
             "completion" to completionExecutor,
             "executed completion" to executedCompletionExecutor,
+            "highlighting" to highlightExecutor,
         )
         private val defaultTestDataPath = Path("src/test/testData")
         val denyAllExternalReferences: (PsiElement) -> String? = { null }
@@ -77,6 +78,8 @@ data class DirectoryTestConfig(
                 "resolve",
                 "hints",
                 "executed completion",
+                // highlighting controls write actions itself
+                "highlighting",
             ),
             defaultTestDataPath,
             emptyList(),
