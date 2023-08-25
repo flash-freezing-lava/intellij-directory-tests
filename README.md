@@ -22,6 +22,7 @@ dependencies {
 
 tasks {
     test {
+        inputs.dir("src/test/testData") // = DirectoryTestConfig.testDataPath, to rerun if test data changed
         useJUnitPlatform()
     }
 }
