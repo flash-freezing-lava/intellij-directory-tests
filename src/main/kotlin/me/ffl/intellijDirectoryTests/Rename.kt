@@ -1,5 +1,6 @@
 package me.ffl.intellijDirectoryTests
 
+import com.intellij.openapi.application.runWriteAction
 import com.intellij.refactoring.util.CommonRefactoringUtil.RefactoringErrorHintException
 import io.kotest.matchers.shouldBe
 import me.ffl.intellijDirectoryTests.MarkupFile.Companion.findCarets
@@ -16,7 +17,9 @@ val renameExecutor: KotestExecutor = {
     }
 
     try {
-        caret.file.renameElementAt(caret.offset, newName)
+        runWriteAction {
+            caret.file.renameElementAt(caret.offset, newName)
+        }
         if (errorFile.exists()) {
             fail("Rename did not fail, when it was expected")
         }

@@ -1,5 +1,6 @@
 package me.ffl.intellijDirectoryTests
 
+import com.intellij.openapi.application.runWriteAction
 import com.intellij.psi.impl.DebugUtil
 import com.intellij.testFramework.ParsingTestUtil
 import io.kotest.matchers.shouldBe
@@ -10,7 +11,7 @@ val parserExecutor: KotestExecutor = {
         (it.nameWithoutExtension == testName || it.nameWithoutExtension == "input") && it.extension != "txt"
     } ?: error("No or multiple input files found")
     val txtFile = testDataPath / "$testName.txt"
-    val inputMarkupFile = MarkupFile(myFixture, myFixture.createFile("${inputFile.fileName}", ""), inputFile.readText())
+    val inputMarkupFile = runWriteAction { MarkupFile(myFixture, myFixture.createFile("${inputFile.fileName}", ""), inputFile.readText()) }
     val inputPsiFile = myFixture.psiManager.findFile(inputMarkupFile.vFile) ?: error("Markup file without psi file")
     val inputFileExtension = inputFile.extension
     assert(!(testDataPath / "allow_errors.txt").exists()) { "Migrate outdated allow_errors.txt to newer <parse-error> format" }

@@ -14,10 +14,6 @@ data class DirectoryTestConfig(
      * For other test executors, lighter in-memory files are used.
      */
     val needsHeavyTestRunner: Set<String>,
-    /**
-     * Set of test executors, that should not be wrapped into a write action.
-     */
-    val useNoWriteAction: Set<String>,
     val testDataPath: Path,
     val knownIntentions: List<IntentionAction>,
     /**
@@ -68,19 +64,6 @@ data class DirectoryTestConfig(
         val default = DirectoryTestConfig(
             defaultKotestExecutors,
             emptySet(),
-            setOf(
-                "documentation",
-                "find usages",
-                // Unintuitively, actions must not be called in a write action.
-                // They start a write action themselves and dispatch UI events before that,
-                // which makes test fails, because UI events must not get dispatched in a write action.
-                "actions",
-                "resolve",
-                "hints",
-                "executed completion",
-                // highlighting controls write actions itself
-                "highlighting",
-            ),
             defaultTestDataPath,
             emptyList(),
             false,

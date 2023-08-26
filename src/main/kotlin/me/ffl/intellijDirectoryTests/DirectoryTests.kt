@@ -1,6 +1,5 @@
 package me.ffl.intellijDirectoryTests
 
-import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.testFramework.TestApplicationManager
 import com.intellij.testFramework.UITestUtil.replaceIdeEventQueueSafely
 import com.intellij.testFramework.builders.EmptyModuleFixtureBuilder
@@ -102,24 +101,18 @@ abstract class DirectoryTests(config: DirectoryTestConfig = DirectoryTestConfig.
                             test(testName) {
                                 setupTest(testName, executorName in config.needsHeavyTestRunner)
                                 val context = config.createContext(testName, testDataPath, myFixture!!)
-                                if (executorName in config.useNoWriteAction) {
-                                    // don't create application in EDT
-                                    TestApplicationManager.getInstance()
-                                    val policy = IdeaTestExecutionPolicy.current()
-                                    val runInDispatchThread = policy?.runInDispatchThread() ?: true
-                                    if (runInDispatchThread) {
-                                        // copied from UsefulTestCase::runBare
-                                        replaceIdeEventQueueSafely()
-                                        runInEdtAndWait {
-                                            execute(executor, context)
-                                        }
-                                    } else {
+                                // don't create application in EDT
+                                TestApplicationManager.getInstance()
+                                val policy = IdeaTestExecutionPolicy.current()
+                                val runInDispatchThread = policy?.runInDispatchThread() ?: true
+                                if (runInDispatchThread) {
+                                    // copied from UsefulTestCase::runBare
+                                    replaceIdeEventQueueSafely()
+                                    runInEdtAndWait {
                                         execute(executor, context)
                                     }
                                 } else {
-                                    WriteCommandAction.runWriteCommandAction(context.myFixture.project) {
-                                        execute(executor, context)
-                                    }
+                                    execute(executor, context)
                                 }
                             }
                         }

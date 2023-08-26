@@ -9,6 +9,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 - New `highlighting` test executor
 
+### Removed
+- `DirectoryTestConfig.useNoWriteAction` was removed. Test executors are now responsible themselves to wrap code in write action.
+
 ## [0.2.2] 2023-08-25
 
 ### Fixed

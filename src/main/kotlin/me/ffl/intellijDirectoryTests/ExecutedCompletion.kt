@@ -5,6 +5,7 @@ import com.intellij.codeInsight.lookup.Lookup
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupManager
 import com.intellij.codeInsight.lookup.impl.LookupImpl
+import com.intellij.openapi.application.runWriteAction
 import com.intellij.refactoring.suggested.startOffset
 import io.kotest.assertions.withClue
 import io.kotest.matchers.collections.shouldNotBeEmpty
@@ -138,7 +139,9 @@ val executedCompletionExecutor: KotestExecutor = {
     val selectedElement = select(caret, beforeFiles, results)
 
     val lookupImpl = LookupManager.getActiveLookup(myFixture.editor) as LookupImpl
-    lookupImpl.finishLookup(Lookup.NORMAL_SELECT_CHAR, selectedElement)
+    runWriteAction {
+        lookupImpl.finishLookup(Lookup.NORMAL_SELECT_CHAR, selectedElement)
+    }
 
     checkAfterProject()
 
