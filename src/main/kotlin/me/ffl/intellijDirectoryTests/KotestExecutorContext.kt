@@ -4,14 +4,9 @@ import com.intellij.openapi.application.runWriteAction
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.testFramework.VfsTestUtil
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
-import com.intellij.util.io.isDirectory
-import com.intellij.util.io.isFile
 import io.kotest.assertions.*
 import io.kotest.assertions.print.Printed
-import io.kotest.assertions.print.printed
-import io.kotest.matchers.ints.shouldBeExactly
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldHave
 import java.nio.file.Path
 import kotlin.io.path.*
 
@@ -53,7 +48,7 @@ class KotestExecutorContext(
             } else {
                 if (!referencePath.exists()) {
                     fail("$relPath has no corresponding file in after project")
-                } else if (!referencePath.isFile()) {
+                } else if (!referencePath.isRegularFile()) {
                     fail("$relPath is not a file in after project")
                 } else {
                     myFixture.openFileInEditor(file)

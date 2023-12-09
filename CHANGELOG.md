@@ -12,6 +12,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Removed
 - `DirectoryTestConfig.useNoWriteAction` was removed. Test executors are now responsible themselves to wrap code in write action.
 
+### Changed
+- Updated to intellij platform `2023.3`
+
 ## [0.2.2] 2023-08-25
 
 ### Fixed

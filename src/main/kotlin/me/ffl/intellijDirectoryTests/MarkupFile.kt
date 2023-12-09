@@ -2,13 +2,10 @@ package me.ffl.intellijDirectoryTests
 
 import com.intellij.codeInsight.TargetElementUtil
 import com.intellij.codeInsight.documentation.DocumentationManager
-import com.intellij.codeInsight.hints.InlayHintsPassFactory
 import com.intellij.codeInsight.intention.IntentionAction
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.model.psi.PsiSymbolService
-import com.intellij.openapi.progress.EmptyProgressIndicator
-import com.intellij.openapi.util.TextRange
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiDocumentManager
@@ -18,14 +15,12 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiLanguageInjectionHost
 import com.intellij.psi.PsiLanguageInjectionHost.Shred
 import com.intellij.psi.PsiPolyVariantReference
-import com.intellij.psi.impl.source.tree.injected.InjectedFileViewProvider
 import com.intellij.psi.util.descendantsOfType
 import com.intellij.refactoring.suggested.startOffset
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.usageView.UsageInfo
 import io.kotest.assertions.withClue
 import io.kotest.matchers.collections.shouldHaveSize
-import org.intellij.lang.annotations.Language
 import kotlin.reflect.KClass
 
 class MarkupFile(
@@ -207,10 +202,7 @@ class MarkupFile(
 
     fun getHintAt(offset: Int): String? {
         myFixture.openFileInEditor(vFile)
-        val highlightingPass = InlayHintsPassFactory().createHighlightingPass(myFixture.file, myFixture.editor)
-            ?: throw AssertionError("No highlighting pass was constructed")
-        highlightingPass.doCollectInformation(EmptyProgressIndicator())
-        highlightingPass.doApplyInformationToEditor()
+        myFixture.doHighlighting()
         val hints = myFixture.editor.inlayModel.getInlineElementsInRange(offset, offset).map {
             it.renderer.toString()
         }

@@ -17,7 +17,7 @@ val parserExecutor: KotestExecutor = {
     assert(!(testDataPath / "allow_errors.txt").exists()) { "Migrate outdated allow_errors.txt to newer <parse-error> format" }
     inputMarkupFile.assertExactParsingErrors()
     if (!inputMarkupFile.expectsParseErrors) {
-        ParsingTestUtil.ensureNoErrorElements(inputPsiFile)
+        ParsingTestUtil.assertNoPsiErrorElements(inputPsiFile)
     }
     var expected = txtFile.readText()
     // rewrite files, that were created with the in-memory PSI viewer

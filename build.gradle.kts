@@ -4,7 +4,7 @@ val ossrhUsername: String? by project
 val ossrhPassword: String? by project
 
 plugins {
-    kotlin("jvm") version "1.8.20" // See https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library for the correct version
+    kotlin("jvm") version "1.9.10" // See https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library for the correct version
     `java-library`
     `maven-publish`
     signing
@@ -23,7 +23,7 @@ dependencies {
     val kotestVersion = "5.6.0"
     api("io.kotest:kotest-runner-junit5:$kotestVersion")
     api("io.kotest:kotest-assertions-core:$kotestVersion")
-    compileOnlyApi("com.jetbrains.intellij.platform:test-framework:232.8660.185")
+    compileOnlyApi("com.jetbrains.intellij.platform:test-framework:233.11799.259")
 }
 
 java {
