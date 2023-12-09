@@ -2,10 +2,14 @@ package me.ffl.intellijDirectoryTests
 
 import com.intellij.codeInsight.TargetElementUtil
 import com.intellij.codeInsight.documentation.DocumentationManager
+import com.intellij.codeInsight.hints.declarative.*
+import com.intellij.codeInsight.hints.declarative.impl.DeclarativeInlayRenderer
+import com.intellij.codeInsight.hints.declarative.impl.InlayTreeSinkImpl
 import com.intellij.codeInsight.intention.IntentionAction
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.model.psi.PsiSymbolService
+import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiDocumentManager
@@ -15,6 +19,7 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiLanguageInjectionHost
 import com.intellij.psi.PsiLanguageInjectionHost.Shred
 import com.intellij.psi.PsiPolyVariantReference
+import com.intellij.psi.SyntaxTraverser
 import com.intellij.psi.util.descendantsOfType
 import com.intellij.refactoring.suggested.startOffset
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
@@ -200,12 +205,52 @@ class MarkupFile(
         return documentationProvider.generateDoc(target, originalElement)
     }
 
+    fun collectDeclarativeInlayHints(): Map<Int, List<String>> {
+        val providerInfos = InlayHintsProviderFactory.getProvidersForLanguage(myFixture.file.language)
+        val file = myFixture.file!!
+        val editor = myFixture.editor
+        val data = providerInfos.flatMap { providerInfo ->
+            val collector = providerInfo.provider.createCollector(file, editor) ?: return@flatMap emptyList()
+            val treeSink = InlayTreeSinkImpl(
+                providerInfo.providerId,
+                emptyMap(),
+                isInPreview = false,
+                providerIsDisabled = false,
+                providerClass = providerInfo.provider.javaClass
+            )
+            when (collector) {
+                is OwnBypassCollector -> {
+                    collector.collectHintsForFile(file, treeSink)
+                }
+                is SharedBypassCollector -> {
+                    SyntaxTraverser.psiTraverser(file).forEach {
+                        collector.collectFromElement(it, treeSink)
+                    }
+                }
+            }
+            treeSink.finish()
+        }
+        return data.groupBy({ inlayData ->
+            val fileOffset = when (val pos = inlayData.position) {
+                is EndOfLinePosition -> editor.logicalPositionToOffset(LogicalPosition(pos.line + 1, 0))
+                is InlineInlayPosition -> pos.offset
+            }
+            fileOffset
+        }) { inlayData ->
+            val strings = (0..<inlayData.tree.size).mapNotNull { inlayData.tree.getDataPayload(it.toByte()) as? String }
+            strings.joinToString("")
+        }
+    }
+
     fun getHintAt(offset: Int): String? {
         myFixture.openFileInEditor(vFile)
+        val declarativeHints = collectDeclarativeInlayHints()[offset].orEmpty()
         myFixture.doHighlighting()
-        val hints = myFixture.editor.inlayModel.getInlineElementsInRange(offset, offset).map {
-            it.renderer.toString()
+        val otherHints = myFixture.editor.inlayModel.getInlineElementsInRange(offset, offset).mapNotNull {
+            if (it.renderer is DeclarativeInlayRenderer) null
+            else it.renderer.toString()
         }
+        val hints = declarativeHints + otherHints
         if (hints.isEmpty()) return null
         withClue({
             "File $name: There should be only one hint at ${lineCol(offset)}"
