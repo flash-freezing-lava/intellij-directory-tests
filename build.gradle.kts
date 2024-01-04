@@ -23,7 +23,7 @@ dependencies {
     val kotestVersion = "5.6.0"
     api("io.kotest:kotest-runner-junit5:$kotestVersion")
     api("io.kotest:kotest-assertions-core:$kotestVersion")
-    compileOnlyApi("com.jetbrains.intellij.platform:test-framework:233.11799.259")
+    compileOnlyApi("com.jetbrains.intellij.platform:test-framework:233.13135.103")
 }
 
 java {
