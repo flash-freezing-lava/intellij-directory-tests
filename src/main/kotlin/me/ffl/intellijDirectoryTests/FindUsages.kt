@@ -20,12 +20,12 @@ val findUsagesExecutor: KotestExecutor = {
                     val usingElement = usage.element
                     val start = usingElement!!.startOffset + (usage.rangeInElement?.startOffset ?: 0)
                     val lineCol = markupFile.lineCol(start)
-                    val reference = usingElement.reference
-                    if (reference == null) {
+                    val references = usingElement.references
+                    if (references.isEmpty()) {
                         fail("""File $fileName: Using element "${usingElement.text}"($lineCol) of type ${usingElement.javaClass.simpleName} had no reference""")
                     } else {
-                        if (!reference.isReferenceTo(usageResult.definitionElement)) {
-                            fail("""File $fileName: Inconsistent isReferenceTo implementation in class ${reference.javaClass} in reference from "${usingElement.text}"($lineCol) of type ${usingElement.javaClass.simpleName}""")
+                        if (references.none { it.isReferenceTo(usageResult.definitionElement) }) {
+                            fail("""File $fileName: Inconsistent isReferenceTo implementation in class ${references.javaClass} in reference from "${usingElement.text}"($lineCol) of type ${usingElement.javaClass.simpleName}""")
                         }
                         if (start !in wantedUsages) {
                             fail("""File $fileName: Reference from "${usingElement.text}"(${lineCol}) of type ${usingElement.javaClass.simpleName} was not supposed to exist""")
