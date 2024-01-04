@@ -246,7 +246,10 @@ class MarkupFile(
         myFixture.openFileInEditor(vFile)
         val declarativeHints = collectDeclarativeInlayHints()[offset].orEmpty()
         myFixture.doHighlighting()
-        val otherHints = myFixture.editor.inlayModel.getInlineElementsInRange(offset, offset).mapNotNull {
+        val inlays = myFixture.editor.inlayModel.getBlockElementsInRange(offset, offset) +
+                myFixture.editor.inlayModel.getInlineElementsInRange(offset, offset) +
+                myFixture.editor.inlayModel.getAfterLineEndElementsInRange(offset, offset)
+        val otherHints = inlays.mapNotNull {
             if (it.renderer is DeclarativeInlayRenderer) null
             else it.renderer.toString()
         }
