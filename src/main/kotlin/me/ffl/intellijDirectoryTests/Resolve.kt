@@ -15,14 +15,15 @@ val resolveExecutor: KotestExecutor = {
         withClue(if (caret.name == null) "Resolve nameless caret" else "Resolve caret ${caret.name}") {
             val reference = caret.file.findReferenceAt(caret.offset)
             val hasNoReference = projectFiles.all { it.findWantedReferencePositions(caret).isEmpty() } && getWantedExternalReferences().isEmpty()
-            val referencedElements = if (hasNoReference) {
-                emptyList()
+            val resolveResults = if (hasNoReference) {
+                reference?.multiResolve(true).orEmpty()
             } else {
                 reference.shouldNotBeNull {
                     "File ${caret.file.name}: No reference found at offset ${caret.file.lineCol(caret.offset)}"
-                }.multiResolve(false).map {
-                    it.element.shouldNotBeNull { "File ${caret.file.name}:${caret.file.lineCol(caret.offset)}: A ResolveResult had no element" }
-                }
+                }.multiResolve(false)
+            }
+            val referencedElements = resolveResults.map {
+                it.element.shouldNotBeNull { "File ${caret.file.name}:${caret.file.lineCol(caret.offset)}: A ResolveResult had no element" }
             }
             val projectVirtualFiles = projectFiles.map { it.vFile }
             val (internalReferences, externalReferences) = referencedElements.partition { it.containingFile.virtualFile in projectVirtualFiles }
