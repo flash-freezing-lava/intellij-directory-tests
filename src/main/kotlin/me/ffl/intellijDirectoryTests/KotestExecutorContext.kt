@@ -1,12 +1,16 @@
 package me.ffl.intellijDirectoryTests
 
 import com.intellij.openapi.application.runWriteAction
+import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.testFramework.VfsTestUtil
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
+import com.intellij.testFramework.fixtures.impl.CodeInsightTestFixtureImpl
 import io.kotest.assertions.*
 import io.kotest.assertions.print.Printed
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import java.nio.file.Path
 import kotlin.io.path.*
 
@@ -76,23 +80,30 @@ class KotestExecutorContext(
         checkFile(currentRoot)
     }
 
-    fun Path.loadProject(): List<MarkupFile> = runWriteAction {
-        val referenceRootPath = this
-        val root = myFixture.tempDirFixture.getFile(".")!!
+    fun Path.loadProject(): List<MarkupFile> {
+        val res = runWriteAction {
+            val referenceRootPath = this
+            val root = myFixture.tempDirFixture.getFile(".")!!
 
-        fun markupFile(path: Path): List<MarkupFile> {
-            val relPath = referenceRootPath.relativize(path)
-            return if (path.isDirectory()) {
-                // Don't create project dir. It already exists.
-                if (referenceRootPath != path) VfsTestUtil.createDir(root, relPath.toString())
-                path.listDirectoryEntries().flatMap(::markupFile)
-            } else {
-                val file = VfsTestUtil.createFile(root, relPath.toString())
-                listOf(MarkupFile(myFixture, file, path.readText()).apply { assertExactParsingErrors() })
+            fun markupFile(path: Path): List<MarkupFile> {
+                val relPath = referenceRootPath.relativize(path)
+                return if (path.isDirectory()) {
+                    // Don't create project dir. It already exists.
+                    if (referenceRootPath != path) VfsTestUtil.createDir(root, relPath.toString())
+                    path.listDirectoryEntries().flatMap(::markupFile)
+                } else {
+                    val file = VfsTestUtil.createFile(root, relPath.toString())
+                    listOf(MarkupFile(myFixture, file, path.readText()).apply { assertExactParsingErrors() })
+                }
             }
-        }
 
-        return@runWriteAction markupFile(referenceRootPath)
+            return@runWriteAction markupFile(referenceRootPath)
+        }
+        runBlocking(Dispatchers.Default) {
+            CodeInsightTestFixtureImpl.ensureIndexesUpToDate(myFixture.project)
+            DumbService.getInstance(myFixture.project).waitForSmartMode()
+        }
+        return res
     }
 
     fun fail(message: String, cause: Throwable? = null) {
