@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Changed
+- Updated to intellij platform `2024.1`
+
+### Fixed
+- Now waits for indexing on project loading
+- No longer give a false-positive if a there are references to an element that should have none
+- Accept usages with multiple references in `find usages` tests
+
 ## [0.3.0] 2023-12-09
 
 ### Added
