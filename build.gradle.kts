@@ -38,6 +38,11 @@ dependencies {
     api("io.kotest:kotest-assertions-core:$kotestVersion") {
         excludeCoroutines()
     }
+    // Not used in this package, but included, so users of property tests
+    // don't need the same setup with excludeCoroutines to use full kotest.
+    api("io.kotest:kotest-property:$kotestVersion") {
+        excludeCoroutines()
+    }
     compileOnly("com.jetbrains.intellij.platform:test-framework:242.20224.387")
 }
 
