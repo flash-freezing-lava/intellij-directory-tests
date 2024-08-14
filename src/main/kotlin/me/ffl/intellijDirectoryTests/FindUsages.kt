@@ -1,6 +1,6 @@
 package me.ffl.intellijDirectoryTests
 
-import com.intellij.refactoring.suggested.startOffset
+import com.intellij.psi.util.startOffset
 import io.kotest.assertions.withClue
 import me.ffl.intellijDirectoryTests.MarkupFile.Companion.findCarets
 

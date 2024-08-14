@@ -3,7 +3,7 @@ package me.ffl.intellijDirectoryTests
 import com.intellij.codeInsight.CodeInsightSettings
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNameIdentifierOwner
-import com.intellij.refactoring.suggested.startOffset
+import com.intellij.psi.util.startOffset
 import io.kotest.assertions.withClue
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldNotContainDuplicates

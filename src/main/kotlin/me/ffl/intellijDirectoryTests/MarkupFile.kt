@@ -21,7 +21,7 @@ import com.intellij.psi.PsiLanguageInjectionHost.Shred
 import com.intellij.psi.PsiPolyVariantReference
 import com.intellij.psi.SyntaxTraverser
 import com.intellij.psi.util.descendantsOfType
-import com.intellij.refactoring.suggested.startOffset
+import com.intellij.psi.util.startOffset
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.usageView.UsageInfo
 import io.kotest.assertions.withClue
