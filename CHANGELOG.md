@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [0.5.0] 2023-08-10
+
 ### Changed
 - Updated to intellij platform `2024.2`
 
