@@ -216,7 +216,8 @@ class MarkupFile(
                 emptyMap(),
                 isInPreview = false,
                 providerIsDisabled = false,
-                providerClass = providerInfo.provider.javaClass
+                providerClass = providerInfo.provider.javaClass,
+                sourceId = "DIR_TEST_SOURCE_ID",
             )
             when (collector) {
                 is OwnBypassCollector -> {

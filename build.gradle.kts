@@ -4,7 +4,7 @@ val ossrhUsername: String? by project
 val ossrhPassword: String? by project
 
 plugins {
-    kotlin("jvm") version "1.9.22" // See https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library for the correct version
+    kotlin("jvm") version "1.9.24" // See https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library for the correct version
     `java-library`
     `maven-publish`
     signing
@@ -19,11 +19,26 @@ repositories {
     maven("https://cache-redirector.jetbrains.com/intellij-dependencies")
 }
 
+// Don't include coroutines, see https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#coroutinesLibraries
+fun ExternalModuleDependency.excludeCoroutines() {
+    exclude("org.jetbrains.kotlinx","kotlinx-coroutines-core")
+    exclude("org.jetbrains.kotlinx","kotlinx-coroutines-core-jvm")
+    exclude("org.jetbrains.kotlin", "kotlin-stdlib")
+    // Coroutines-test seems to be not bundled in intellij, so we allow it as dependency.
+//    exclude("org.jetbrains.kotlinx","kotlinx-coroutines-test")
+    exclude("org.jetbrains.kotlinx","kotlinx-coroutines-debug")
+    exclude("org.jetbrains.kotlinx","kotlinx-coroutines-jdk8")
+}
+
 dependencies {
-    val kotestVersion = "5.6.0"
-    api("io.kotest:kotest-runner-junit5:$kotestVersion")
-    api("io.kotest:kotest-assertions-core:$kotestVersion")
-    compileOnlyApi("com.jetbrains.intellij.platform:test-framework:241.14494.240")
+    val kotestVersion = "5.9.1"
+    api("io.kotest:kotest-runner-junit5:$kotestVersion") {
+        excludeCoroutines()
+    }
+    api("io.kotest:kotest-assertions-core:$kotestVersion") {
+        excludeCoroutines()
+    }
+    compileOnly("com.jetbrains.intellij.platform:test-framework:242.20224.387")
 }
 
 java {
