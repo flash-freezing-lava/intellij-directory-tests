@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "me.ffl"
-version = "0.6.0"
+version = "2025.1-1.0"
 
 repositories {
     mavenCentral()

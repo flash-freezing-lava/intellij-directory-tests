@@ -3,6 +3,8 @@
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+Since `2025.1-1.0` the versioning scheme is `intellijRelease-major.minor`.
+Intellij releases are automatically major releases and reset major version to 1.
 
 ## [Unreleased]
 
