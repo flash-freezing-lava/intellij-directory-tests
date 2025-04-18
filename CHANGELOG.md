@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+- `DirectoryTestConfig.overrideDocumentationOutput` allows to overwrite documentation similar to `overrideParserOutput`
+
 ### Changed
 - Updated to intellij platform `2025.1`
 

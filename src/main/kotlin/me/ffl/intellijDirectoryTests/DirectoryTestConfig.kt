@@ -23,6 +23,12 @@ data class DirectoryTestConfig(
      */
     val overrideParserOutput: Boolean,
     /**
+     * If true (by default this is false), the files specifying expected documentation output is overridden with the actual output.
+     * This is useful, if you prefer to use `git diff` or intellij's diff view, to check the correctness of changed parser output.
+     * Obviously, you should `git restore` the files, if the output did not change in the intended way.
+     */
+    val overrideDocumentationOutput: Boolean,
+    /**
      * This function is used to check, whether a reference to a psi element outside the project,
      * corresponds to an entry of `external references.txt`.
      * This cannot be implemented by intellijDirectoryTests, because it is specific to the tested language.
@@ -62,14 +68,15 @@ data class DirectoryTestConfig(
         private val defaultTestDataPath = Path("src/test/testData")
         val denyAllExternalReferences: (PsiElement) -> String? = { null }
         val default = DirectoryTestConfig(
-            defaultKotestExecutors,
-            emptySet(),
-            defaultTestDataPath,
-            emptyList(),
-            false,
-            denyAllExternalReferences,
-            null,
-            true,
+            kotestExecutors = defaultKotestExecutors,
+            needsHeavyTestRunner = emptySet(),
+            testDataPath = defaultTestDataPath,
+            knownIntentions = emptyList(),
+            overrideParserOutput = false,
+            overrideDocumentationOutput = false,
+            externalReferenceToString = denyAllExternalReferences,
+            projectDescriptor = null,
+            softAssertByDefault = true,
         )
 
         fun String.simplifyIntentionName() = removeSuffix("Action").removeSuffix("Intention")
