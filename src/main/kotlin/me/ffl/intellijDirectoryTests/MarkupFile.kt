@@ -235,6 +235,7 @@ class MarkupFile(
             val fileOffset = when (val pos = inlayData.position) {
                 is EndOfLinePosition -> editor.logicalPositionToOffset(LogicalPosition(pos.line + 1, 0))
                 is InlineInlayPosition -> pos.offset
+                is AboveLineIndentedPosition -> editor.logicalPositionToOffset(LogicalPosition(editor.offsetToLogicalPosition(pos.offset).line, 0))
             }
             fileOffset
         }) { inlayData ->

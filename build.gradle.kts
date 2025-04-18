@@ -4,7 +4,7 @@ val ossrhUsername: String? by project
 val ossrhPassword: String? by project
 
 plugins {
-    kotlin("jvm") version "2.0.21" // See https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library for the correct version
+    kotlin("jvm") version "2.1.10" // See https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library for the correct version
     `java-library`
     `maven-publish`
     signing
@@ -15,6 +15,7 @@ version = "0.6.0"
 
 repositories {
     mavenCentral()
+//    maven("https://www.jetbrains.com/intellij-repository/snapshots")
     maven("https://www.jetbrains.com/intellij-repository/releases")
     maven("https://cache-redirector.jetbrains.com/intellij-dependencies")
 }
@@ -43,7 +44,15 @@ dependencies {
     api("io.kotest:kotest-property:$kotestVersion") {
         excludeCoroutines()
     }
-    compileOnly("com.jetbrains.intellij.platform:test-framework:243.22562.218")
+
+    // See https://plugins.jetbrains.com/docs/intellij/intellij-artifacts.html
+    val ideaVersion = "251.23774.430"
+//    val ideaVersion = "251.23774-EAP-CANDIDATE-SNAPSHOT"
+    compileOnly("com.jetbrains.intellij.platform:test-framework:$ideaVersion")
+    compileOnly("com.jetbrains.intellij.platform:refactoring:$ideaVersion")
+    compileOnly("com.jetbrains.intellij.platform:analysis-impl:$ideaVersion")
+    compileOnly("com.jetbrains.intellij.platform:lang-impl:$ideaVersion")
+    compileOnly("com.jetbrains.intellij.platform:util-jdom:$ideaVersion")
 }
 
 java {
@@ -59,7 +68,7 @@ tasks {
     }
 
     wrapper {
-        gradleVersion = "8.7"
+        gradleVersion = "8.13"
         distributionType = DistributionType.ALL
     }
 }
