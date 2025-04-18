@@ -1,5 +1,6 @@
 package me.ffl.intellijDirectoryTests
 
+import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.testFramework.TestApplicationManager
 import com.intellij.testFramework.UITestUtil.replaceIdeEventQueueSafely
 import com.intellij.testFramework.builders.EmptyModuleFixtureBuilder
@@ -11,6 +12,10 @@ import com.intellij.testFramework.fixtures.TempDirTestFixture
 import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl
 import com.intellij.testFramework.runInEdtAndWait
 import io.kotest.assertions.assertSoftly
+import io.kotest.assertions.collectOrThrow
+import io.kotest.assertions.errorCollector
+import io.kotest.assertions.failure
+import io.kotest.common.runBlocking
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.core.spec.style.scopes.FunSpecContainerScope
 import java.nio.file.Path
@@ -51,6 +56,18 @@ abstract class DirectoryTests(config: DirectoryTestConfig = DirectoryTestConfig.
             myFixture = IdeaTestFixtureFactory.getFixtureFactory().createCodeInsightFixture(fixture, createTempDirTestFixture())
         }
         myFixture!!.setUp()
+        // Check that all plugins loaded correctly
+        runBlocking {
+            PluginManagerCore.initPluginFuture.await()
+            assertSoftly {
+                PluginManagerCore.plugins.map { it.pluginId }.forEach { pluginId ->
+                    val loadingError = PluginManagerCore.getLoadingError(pluginId)
+                    if (loadingError != null) {
+                        errorCollector.collectOrThrow(failure("Failed to load plugin $pluginId: ${loadingError.shortMessage}\n${loadingError.detailedMessage}"))
+                    }
+                }
+            }
+        }
     }
 
     afterTest {
