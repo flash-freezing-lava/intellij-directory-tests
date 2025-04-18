@@ -7,11 +7,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ## [0.5.0] 2023-08-10
+## [0.5.0] 2024-08-10
 
 ### Changed
 - Updated to intellij platform `2024.2`
 
-## [0.4.0] 2023-04-05
+## [0.4.0] 2024-04-05
 
 ### Changed
 - Updated to intellij platform `2024.1`
