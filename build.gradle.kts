@@ -1,10 +1,13 @@
 import org.gradle.api.tasks.wrapper.Wrapper.DistributionType
 
-val ossrhUsername: String? by project
-val ossrhPassword: String? by project
+val mavenCentralUsername: String by project
+val mavenCentralPassword: String by project
 
 plugins {
     kotlin("jvm") version "2.1.20" // See https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library for the correct version
+    // https://github.com/GradleUp/nmcp
+    // The first non-shitty maintained uploader on https://central.sonatype.org/publish/publish-portal-gradle
+    id("com.gradleup.nmcp.aggregation").version("1.0.3")
     `java-library`
     `maven-publish`
     signing
@@ -120,18 +123,17 @@ publishing {
             }
         }
     }
+}
 
-    repositories {
-        maven {
-            name = "SonatypeMaven"
-
-            url = uri(if (version.toString().endsWith("-SNAPSHOT")) "https://s01.oss.sonatype.org/content/repositories/snapshots/" else "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-            credentials {
-                username = ossrhUsername
-                password = ossrhPassword
-            }
-        }
+nmcpAggregation {
+    centralPortal {
+        username.set(mavenCentralUsername)
+        password.set(mavenCentralPassword)
+        publishingType = "USER_MANAGED"
     }
+
+    // Publish all projects that apply the 'maven-publish' plugin
+    publishAllProjectsProbablyBreakingProjectIsolation()
 }
 
 signing {
