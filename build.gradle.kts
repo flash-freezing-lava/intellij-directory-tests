@@ -32,7 +32,7 @@ fun ExternalModuleDependency.excludeCoroutines() {
 }
 
 dependencies {
-    val kotestVersion = "5.9.1"
+    val kotestVersion = "6.0.0.M17"
     api("io.kotest:kotest-runner-junit5:$kotestVersion") {
         excludeCoroutines()
     }

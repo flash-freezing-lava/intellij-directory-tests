@@ -8,6 +8,7 @@ import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import com.intellij.testFramework.fixtures.impl.CodeInsightTestFixtureImpl
 import io.kotest.assertions.*
 import io.kotest.assertions.print.Printed
+import io.kotest.matchers.errorCollector
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking

@@ -13,18 +13,13 @@ import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl
 import com.intellij.testFramework.runInEdtAndWait
 import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.collectOrThrow
-import io.kotest.assertions.errorCollector
-import io.kotest.assertions.failure
-import io.kotest.common.runBlocking
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.core.spec.style.scopes.FunSpecContainerScope
+import io.kotest.engine.runBlocking
+import io.kotest.matchers.errorCollector
 import java.nio.file.Path
 import kotlin.io.path.*
 
-fun <T: Any> T?.shouldNotBeNull(message: () -> String): T {
-    assert(this != null, message)
-    return this!!
-}
 
 private fun getModuleBuilderClass(): Class<out ModuleFixtureBuilder<*>> =
     EmptyModuleFixtureBuilder::class.java
