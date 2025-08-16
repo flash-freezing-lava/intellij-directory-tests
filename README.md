@@ -2,20 +2,6 @@
 
 ![Maven Central](https://img.shields.io/maven-central/v/io.github.flash-freezing-lava/intellij-directory-tests)
 
-## Version compatibility
-
-
-| Intellij | Directory tests |
-|----------|-----------------|
-| 2025.1   | 2025.1-1.0      |
-| 2024.3   | 0.6.*           |
-| 2024.2   | 0.5.*           |
-| 2024.1   | 0.4.*           |
-| 2023.3   | 0.3.*           |
-| 2023.2   | 0.2.*           |
-| 2023.1   | 0.1.*           |
-
-
 
 ## Including directory tests in your project
 
@@ -110,3 +96,16 @@ This project is licensed under the Apache License, Version 2.0 <[LICENSE-APACHE]
 <[LICENSE-MIT](LICENSE-MIT)>, at your
 option. Files in the project may not be
 copied, modified, or distributed except according to those terms.
+
+## Compatibility of old versions
+
+After version `0.6.0`, the compatible intellij version is part of the directory-test version and therefore not including here.
+
+| Intellij | Directory tests |
+|----------|-----------------|
+| 2024.3   | 0.6.*           |
+| 2024.2   | 0.5.*           |
+| 2024.1   | 0.4.*           |
+| 2023.3   | 0.3.*           |
+| 2023.2   | 0.2.*           |
+| 2023.1   | 0.1.*           |

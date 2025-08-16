@@ -8,6 +8,13 @@ Intellij releases are automatically major releases and reset major version to 1.
 
 ## [Unreleased]
 
+## [2025.2-1.0] 2025-08-16
+
+### Changed
+- Updated to intellij platform `2025.2`
+
+## [2025.1-1.0] 2025-04-25
+
 ### Breaking
 - Test no longer pass if any plugin failed to load
 
