@@ -9,6 +9,7 @@ import com.intellij.codeInsight.intention.IntentionAction
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.lang.injection.InjectedLanguageManager
 import com.intellij.model.psi.PsiSymbolService
+import com.intellij.model.psi.impl.targetDeclarationAndReferenceSymbols
 import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
@@ -27,6 +28,7 @@ import com.intellij.usageView.UsageInfo
 import io.kotest.assertions.withClue
 import io.kotest.matchers.collections.shouldHaveSize
 import kotlin.reflect.KClass
+import kotlin.text.get
 
 class MarkupFile(
     private val myFixture: CodeInsightTestFixture,
@@ -150,7 +152,7 @@ class MarkupFile(
 
     fun findUsagesAt(offset: Int): FindUsagesResult {
         val (injectedFile, injectedOffset) = getInjectedFileAnsOffset(offset)
-        val (declaration, _) = com.intellij.model.psi.impl.targetDeclarationAndReferenceSymbols(injectedFile, injectedOffset)
+        val (declaration, _) = targetDeclarationAndReferenceSymbols(injectedFile, injectedOffset)
         assert(declaration.isNotEmpty()) {
             "File $name: No declaration found at ${lineCol(offset)}"
         }

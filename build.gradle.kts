@@ -4,14 +4,14 @@ val ossrhUsername: String? by project
 val ossrhPassword: String? by project
 
 plugins {
-    kotlin("jvm") version "2.1.10" // See https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library for the correct version
+    kotlin("jvm") version "2.1.20" // See https://plugins.jetbrains.com/docs/intellij/using-kotlin.html#kotlin-standard-library for the correct version
     `java-library`
     `maven-publish`
     signing
 }
 
 group = "me.ffl"
-version = "2025.1-1.0"
+version = "2025.2-1.0"
 
 repositories {
     mavenCentral()
@@ -46,13 +46,20 @@ dependencies {
     }
 
     // See https://plugins.jetbrains.com/docs/intellij/intellij-artifacts.html
-    val ideaVersion = "251.23774.430"
-//    val ideaVersion = "251.23774-EAP-CANDIDATE-SNAPSHOT"
+    val ideaVersion = "252.23892.515"
+
+    // To find out which artifacts are needed, see download-intellij.md
     compileOnly("com.jetbrains.intellij.platform:test-framework:$ideaVersion")
     compileOnly("com.jetbrains.intellij.platform:refactoring:$ideaVersion")
+    compileOnly("com.jetbrains.intellij.platform:analysis:$ideaVersion")
     compileOnly("com.jetbrains.intellij.platform:analysis-impl:$ideaVersion")
     compileOnly("com.jetbrains.intellij.platform:lang-impl:$ideaVersion")
     compileOnly("com.jetbrains.intellij.platform:util-jdom:$ideaVersion")
+    compileOnly("com.jetbrains.intellij.platform:util:$ideaVersion")
+    compileOnly("com.jetbrains.intellij.platform:core:$ideaVersion")
+    compileOnly("com.jetbrains.intellij.platform:editor-ui:$ideaVersion")
+    compileOnly("com.jetbrains.intellij.platform:project-model:$ideaVersion")
+    compileOnly("com.jetbrains.intellij.platform:core-ui:$ideaVersion")
 }
 
 java {
